@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -28,6 +29,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+
+import networking.RequestManager;
 
 public class Market {
 
@@ -50,6 +53,7 @@ public class Market {
 	private Socket clientSocket;
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
+	private RequestManager requestManager;
 
 	//-------------------------------------------------------------------------------------//
 	//Constructor
@@ -84,6 +88,7 @@ public class Market {
 	private void openConnection() {
 
 		try {
+
 			clientSocket = new Socket(SERVER_NAME, PORT);
 			System.out.println("Just connected to " + clientSocket.getRemoteSocketAddress());
 
@@ -92,6 +97,7 @@ public class Market {
 			InputStream inFromServer = clientSocket.getInputStream();
 			in = new ObjectInputStream(inFromServer);
 
+			requestManager = RequestManager.getInstance();
 			initialize();
 
 		} catch (UnknownHostException e) {
@@ -113,7 +119,6 @@ public class Market {
 			e.printStackTrace();
 		}
 	}
-
 
 	//-------------------------------------------------------------------------------------//
 
@@ -166,6 +171,10 @@ public class Market {
 		signInButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
+				HashMap<String, Object> parameters = new HashMap<>();
+				parameters.put("username", usernameLoginField.getText());
+				parameters.put("password", passwordField.getPassword());
+				requestManager.sendLoginRequest(in, out, parameters);
 				app();
 				CardLayout cardLayout = (CardLayout) welcomeFrame.getContentPane().getLayout();
 				cardLayout.show(welcomeFrame.getContentPane(), "appPanel");

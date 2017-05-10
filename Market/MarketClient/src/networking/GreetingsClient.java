@@ -25,14 +25,6 @@ public class GreetingsClient {
 
 			GreetingsClient.sendGetProductsByCategoryRequest(in, out);
 
-			try {
-				System.out.println("Server says " + in.readObject().toString());
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-
 			client.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -47,7 +39,6 @@ public class GreetingsClient {
 		parameters.put("username", "asd");
 		parameters.put("password", "asd");
 		req.setParameters(parameters);
-
 
 		try {
 			out.writeObject(req);
@@ -79,7 +70,6 @@ public class GreetingsClient {
 		parameters.put("password", "asd1");
 		parameters.put("email", "asd1@asd.com");
 		req.setParameters(parameters);
-
 
 		try {
 			out.writeObject(req);
@@ -161,8 +151,3 @@ public class GreetingsClient {
 
 	}
 }
-
-
-
-
-
