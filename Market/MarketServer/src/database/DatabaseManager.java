@@ -8,8 +8,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
-
 public class DatabaseManager {
 
 	// -------------------------------------------------------------------------------------//
@@ -45,7 +43,7 @@ public class DatabaseManager {
 			Class.forName("com.mysql.jdbc.Driver");
 			System.out.println("Connecting to database...");
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
-			System.out.println("Connected.");
+			System.out.println("Connected to database.");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -56,7 +54,7 @@ public class DatabaseManager {
 	public void disconnect() {
 		try {
 			connection.close();
-			System.out.println("Disconnected.");
+			System.out.println("Disconnected from database.");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -66,15 +64,9 @@ public class DatabaseManager {
 
 
 
-
-
-
-
 	// -------------------------------------------------------------------------------------//
 	// Functionality Methods
 	// -------------------------------------------------------------------------------------//
-
-
 
 	public ArrayList<HashMap<String, Object>> login(String username, String password) {
 
@@ -98,7 +90,8 @@ public class DatabaseManager {
 						"Got from database: " + id + " " + createTime + " " + email + " " + usern + " " + pass);
 
 				HashMap<String, Object> user = new HashMap<>();
-				user.put("success", "true");//TODO REMOVE THIS AND REWORK THE RESPONSE CLASS
+				user.put("success", "true");// TODO REMOVE THIS AND REWORK THE
+											// RESPONSE CLASS
 				user.put("id", id);
 				user.put("createTime", createTime);
 				user.put("email", email);
@@ -117,15 +110,10 @@ public class DatabaseManager {
 
 	// -------------------------------------------------------------------------------------//
 
-
 	public ArrayList<HashMap<String, Object>> register(String username, String password, String email) {
 
 		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
 		try {
-			/*PreparedStatement stmt = connection
-					.prepareStatement("INSERT INTO users ( username, password, email ) "
-							+ "VALUES ( '" + username + "' , '" + password + "' , '" + email + "' )");*/
-
 			String command = "INSERT INTO users" + "(username, password, email) VALUES" + "(?,?,?)";
 
 			PreparedStatement preparedStatement = connection.prepareStatement(command);
@@ -135,25 +123,27 @@ public class DatabaseManager {
 
 			preparedStatement.executeUpdate();
 
-
 			HashMap<String, Object> user = new HashMap<>();
-			user.put("success", "true");//TODO REMOVE THIS AND REWORK THE RESPONSE CLASS
+			user.put("success", "true");// TODO REMOVE THIS AND REWORK THE
+										// RESPONSE CLASS
 			user.put("email", email);
 			user.put("username", username);
 			user.put("password", password);
 			System.out.println("successfuly inserted user");
 
-			//			// Display values
-			//			System.out.println(
-			//					"Got from database: " + id + " " + createTime + " " + email + " " + usern + " " + pass);
+			// // Display values
+			// System.out.println(
+			// "Got from database: " + id + " " + createTime + " " + email + " "
+			// + usern + " " + pass);
 			//
-			//			HashMap<String, Object> user = new HashMap<>();
-			//			user.put("success", "true");//TODO REMOVE THIS AND REWORK THE RESPONSE CLASS
-			//			user.put("id", id);
-			//			user.put("createTime", createTime);
-			//			user.put("email", email);
-			//			user.put("username", usern);
-			//			user.put("password", pass)
+			// HashMap<String, Object> user = new HashMap<>();
+			// user.put("success", "true");//TODO REMOVE THIS AND REWORK THE
+			// RESPONSE CLASS
+			// user.put("id", id);
+			// user.put("createTime", createTime);
+			// user.put("email", email);
+			// user.put("username", usern);
+			// user.put("password", pass)
 
 			result.add(user);
 
@@ -164,7 +154,6 @@ public class DatabaseManager {
 	}
 
 	// -------------------------------------------------------------------------------------//
-
 
 	public ArrayList<HashMap<String, Object>> getCategories() {
 
@@ -181,9 +170,9 @@ public class DatabaseManager {
 				int id = rs.getInt("categoryId");
 				String name = rs.getString("name");
 
-
 				HashMap<String, Object> user = new HashMap<>();
-				user.put("success", "true");//TODO REMOVE THIS AND REWORK THE RESPONSE CLASS
+				user.put("success", "true");// TODO REMOVE THIS AND REWORK THE
+											// RESPONSE CLASS
 				user.put("name", name);
 				user.put("categoryId", id);
 				result.add(user);
@@ -196,13 +185,13 @@ public class DatabaseManager {
 
 	// -------------------------------------------------------------------------------------//
 
-
 	public ArrayList<HashMap<String, Object>> getProductsByCategory(int categoryId) {
 
 		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
 		try {
-			//			String command = "SELECT * FROM products INNER JOIN categories ON products.categoryId = categories.categoryId"
-			//					+ "WHERE categoryId=?";
+			// String command = "SELECT * FROM products INNER JOIN categories ON
+			// products.categoryId = categories.categoryId"
+			// + "WHERE categoryId=?";
 			String command = "SELECT * FROM products INNER JOIN categories ON categories.categoryId = products.categoryId WHERE categories.categoryId=?";
 
 			PreparedStatement preparedStatement = connection.prepareStatement(command);
@@ -216,9 +205,9 @@ public class DatabaseManager {
 				String productName = rs.getString("products.name");
 				String categoryName = rs.getString("categories.name");
 
-
 				HashMap<String, Object> user = new HashMap<>();
-				user.put("success", "true");//TODO REMOVE THIS AND REWORK THE RESPONSE CLASS
+				user.put("success", "true");// TODO REMOVE THIS AND REWORK THE
+											// RESPONSE CLASS
 				user.put("productId", productId);
 				user.put("productName", productName);
 				user.put("categoryName", categoryName);
@@ -230,6 +219,5 @@ public class DatabaseManager {
 		}
 		return result;
 	}
-
 
 }
