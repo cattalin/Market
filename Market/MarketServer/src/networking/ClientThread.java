@@ -27,16 +27,24 @@ public class ClientThread implements Runnable {
 	public ClientThread(Socket socket) {
 		this.socket = socket;
 		System.out.println("Just connected to " + socket.getRemoteSocketAddress());
+
+		try {
+			input = new ObjectInputStream(socket.getInputStream());
+			output = new ObjectOutputStream(socket.getOutputStream());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+
 		dbManager = DatabaseManager.getInstance();
+		dbManager.connect();
 	}
 
 	@Override
 	public void run() {
-		//while (true) {
-		try {
-			input = new ObjectInputStream(socket.getInputStream());
-			output = new ObjectOutputStream(socket.getOutputStream());
-
+		while (true)
 			try {
 				Request req = (Request) input.readObject();
 				System.out.println(req);
@@ -44,6 +52,7 @@ public class ClientThread implements Runnable {
 				switch (req.getReqCode()) {
 				case Request.LOGIN:
 					res = getLoginResponse(req);
+					System.out.println(res);
 					output.writeObject(res);
 					output.flush();
 					break;
@@ -67,15 +76,9 @@ public class ClientThread implements Runnable {
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-
-
-			//output.writeObject("Thank you for connecting to " + socket.getLocalSocketAddress() + "\nGoodbye!");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//}
 	}
 
 	public void close() {
@@ -83,6 +86,7 @@ public class ClientThread implements Runnable {
 			input.close();
 			output.close();
 			socket.close();
+			dbManager.disconnect();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
@@ -95,19 +99,21 @@ public class ClientThread implements Runnable {
 	private Response getLoginResponse(Request req) {
 		String username = req.getParameters().get("username").toString();
 		String password = req.getParameters().get("password").toString();
-		dbManager.connect();
+
 
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.login(username, password);
-		Response res = new Response(Response.LOGIN_APPROVED);
+
+		Response res;
 		if (resultParams.size() != 0) {
+			res = new Response(Response.LOGIN_APPROVED);
 			res.setParameters(resultParams);
-		}
+		} else
+			res = new Response(Response.LOGIN_DENIED);
 		return res;
 
 	}
 
 	// -------------------------------------------------------------------------------------//
-
 
 	private Response getRegisterResponse(Request req) {
 		String username = req.getParameters().get("username").toString();
@@ -116,10 +122,13 @@ public class ClientThread implements Runnable {
 		dbManager.connect();
 
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.register(username, password, email);
-		Response res = new Response(Response.REGISTER_SUCCESSFUL);
+		Response res;
 		if (resultParams.size() != 0) {
+			res = new Response(Response.REGISTER_SUCCESSFUL);
 			res.setParameters(resultParams);
-		}
+		} else
+			res = new Response(Response.REGISTER_ERROR);
+
 		return res;
 
 	}
@@ -131,30 +140,32 @@ public class ClientThread implements Runnable {
 		System.out.println("AIIC");
 		dbManager.connect();
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.getCategories();
-		Response res = new Response(Response.GET_CATEGORIES);
+		Response res;
 		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_CATEGORIES);
 			res.setParameters(resultParams);
-		}
-		//System.out.println(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
 		return res;
 
 	}
 
 	// -------------------------------------------------------------------------------------//
 
-
 	private Response getProductsByCategoryResponse(Request req) {
 
 		int categoryId = Integer.parseInt(req.getParameters().get("categoryId").toString());
 		dbManager.connect();
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.getProductsByCategory(categoryId);
-		Response res = new Response(Response.GET_PRODUCTS);
+
+		Response res;
 		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_PRODUCTS);
 			res.setParameters(resultParams);
-		}
+		} else
+			res = new Response(Response.DATABASE_ERROR);
 		return res;
 
 	}
-
 
 }
