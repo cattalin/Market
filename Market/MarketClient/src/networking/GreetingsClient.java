@@ -23,6 +23,8 @@ public class GreetingsClient {
 			InputStream inFromServer = client.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(inFromServer);
 
+			GreetingsClient.sendLoginRequest(in, out);
+			GreetingsClient.sendLoginRequest(in, out);
 			GreetingsClient.sendGetProductsByCategoryRequest(in, out);
 
 			client.close();
@@ -36,8 +38,8 @@ public class GreetingsClient {
 		System.out.println("logging in ");
 		Request req = new Request(Request.LOGIN);
 		HashMap<String, Object> parameters = new HashMap<>();
-		parameters.put("username", "asd");
-		parameters.put("password", "asd");
+		parameters.put("username", "asd1");
+		parameters.put("password", "asd2");
 		req.setParameters(parameters);
 
 		try {
