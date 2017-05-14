@@ -8,8 +8,8 @@ public class Category {
 	//Instance fields
 	//-------------------------------------------------------------------------------------//
 
-	private final String NAME;
-	private final String ID;
+	private final String name;
+	private final String id;
 	private ArrayList<Product> products = new ArrayList<Product>();
 
 	//-------------------------------------------------------------------------------------//
@@ -17,16 +17,22 @@ public class Category {
 	//-------------------------------------------------------------------------------------//
 
 	public Category(String id, String name) {
-		ID = id;
-		NAME = name;
+		this.id = id;
+		this.name = name;
 	}
 
 	//-------------------------------------------------------------------------------------//
 	//Instance methods
 	//-------------------------------------------------------------------------------------//
+	
+	public String getId() {
+		return id;
+	}
+	
+	//-------------------------------------------------------------------------------------//
 
 	public String getName() {
-		return NAME;
+		return name;
 	}
 
 	//-------------------------------------------------------------------------------------//
@@ -45,7 +51,7 @@ public class Category {
 
 	@Override
 	public String toString() {
-		return "Category [ID = " + ID + ", NAME=" + NAME + ", products=" + products + "]";
+		return "Category [id = " + id + ", name=" + name + ", products=" + products + "]";
 	}
 
 }

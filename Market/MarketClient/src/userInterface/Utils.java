@@ -4,63 +4,60 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import models.Category;
+import models.Product;
 import networking.RequestManager;
 import networking.Response;
 
 class Utils {
 
-	public static void generateCategoryList(RequestManager requestManager, JComboBox<Object> categoriesComboBox, JPanel panel, int b1, int b2, int b3, int b4) {
+	public static HashMap<String, Category> generateCategoryList(RequestManager requestManager) {
 
-		HashMap<String, Object> parameters = new HashMap<>();
-		Response response = requestManager.sendGetCategoriesRequest(parameters);
+		Response response = requestManager.sendGetCategoriesRequest();
+		HashMap<String, Category> categories = new HashMap<String, Category>();
 
 		if (response.getResCode() == Response.GET_CATEGORIES) {
-			ArrayList<Category> categories = new ArrayList<Category>();
 
 			for (HashMap<String, Object> currentCategory : response.getParameters()) {
-
-				String categoryID = currentCategory.get("categoryId").toString();
-				String categoryName = currentCategory.get("name").toString();
-				Category category = new Category(categoryID, categoryName);
-				categories.add(category);
+				Category category = new Category(currentCategory.get("categoryId").toString(), currentCategory.get("name").toString());
+				categories.put(currentCategory.get("categoryId").toString(), category);
 			}
 
-			String[] categoriesArray = new String[categories.size()];
-			for (int j = 0; j < categories.size(); j++) {
-				categoriesArray[j] = categories.get(j).getName();
-			}
-
-			categoriesComboBox = new JComboBox<Object>(categoriesArray);
-			categoriesComboBox.setBounds(b1, b2, b3, b4);
-			categoriesComboBox.setSelectedIndex(0);
-			panel.add(categoriesComboBox);
-
-		} else {
-			System.out.println("error!!");
-			return;
+			return categories;
 		}
+
+		System.out.println("error!!");
+		return null;
 	}
 
 	//-------------------------------------------------------------------------------------//
 
-	public static void generateProductList(JPanel panel, int b1, int b2, int b3, int b4) {
+	public static void generateProductList(RequestManager requestManager, HashMap<String, Category> categories) {
 
-		//TODO: implement
+		Response response = requestManager.sendGetCategoriesRequest();
 
-		String[] products = { "Products", "Durex", "Love", "pentru sex" };
-		JComboBox<Object> productsComboBox = new JComboBox<Object>(products);
-		productsComboBox.setBounds(b1, b2, b3, b4);
-		productsComboBox.setSelectedIndex(0);
-		panel.add(productsComboBox);
+		if (response.getResCode() == Response.GET_PRODUCTS) {
+
+			for (HashMap<String, Object> currentProduct : response.getParameters()) {
+
+				Product product = new Product(currentProduct.get("productId").toString(), //
+						currentProduct.get("name").toString(), //
+						currentProduct.get("categoryId").toString());
+
+				Category category = categories.get(currentProduct.get("categoryId").toString());
+				category.addProduct(product);
+
+			}
+
+		}
+
+		System.out.println("error!!");
+		return;
 	}
 
 	//-------------------------------------------------------------------------------------//
@@ -99,13 +96,48 @@ class Utils {
 		textField.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (textField.getText().equals(text))
-					textField.setText("");
+				textField.setText("");
 			}
 		});
 
 		return textField;
 
 	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public static String[] parseAllCategories(HashMap<String, Category> categories) {
+
+		String[] categoriesArray = new String[categories.size()];
+		int i = 0;
+		for (Category current : categories.values()) {
+			categoriesArray[i] = current.getName();
+			i++;
+		}
+
+		return categoriesArray;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public static String[] parseAllProducts(HashMap<String, Category> categories) {
+
+		String[] productsArray = new String[100];
+
+		int i = 0;
+		for (Category current : categories.values()) {
+			for (Product product : current.getProducts()) {
+				productsArray[i] = product.getName();
+				i++;
+			}
+		}
+
+		return productsArray;
+	}
+
+	//		categoriesComboBox = new JComboBox<Object>(categoriesArray);
+	//		categoriesComboBox.setBounds(b1, b2, b3, b4);
+	//		categoriesComboBox.setSelectedIndex(0);
+	//		panel.add(categoriesComboBox);
 
 }

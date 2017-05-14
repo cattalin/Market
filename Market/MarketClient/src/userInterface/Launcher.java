@@ -16,34 +16,47 @@ import javax.swing.JPasswordField;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
+import models.Category;
 import models.User;
 import networking.RequestManager;
 import networking.Response;
 
 public class Launcher {
 
-	//-------------------------------------------------------------------------------------//
-	//Instance fields
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
+	// Instance fields
+	// -------------------------------------------------------------------------------------//
 
-	private JComboBox<Object> categoriesComboBox;
+	private HashMap<String, Category> categories;
 
 	private RequestManager requestManager;
-	private Login login;
-	private User user; //TODO: fix
+	private User user;
 
-	//-------------------------------------------------------------------------------------//
-	//Constructor
-	//-------------------------------------------------------------------------------------//
+	private Login login;
+	private Register register;
+	private Board board;
+	private Navigation navigation;
+	private NewOffer newOffer;
+
+	// -------------------------------------------------------------------------------------//
+	// Constructor
+	// -------------------------------------------------------------------------------------//
 
 	public Launcher() {
+
 		requestManager = RequestManager.getInstance();
+		navigation = Navigation.getInstance();
+		register = Register.getInstance();
+		newOffer = NewOffer.getInstance();
+		login = Login.getInstance();
+		board = Board.getInstance();
+
 		initialize();
 	}
 
-	//-------------------------------------------------------------------------------------//
-	//Instance methods
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
+	// Instance methods
+	// -------------------------------------------------------------------------------------//
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -58,12 +71,13 @@ public class Launcher {
 		});
 	}
 
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
 
 	private void initialize() {
 
-		login = Login.getInstance();
 		login.initialize();
+		register.setWelcomeFrame(login.getWelcomeFrame()).initialize();
+		generateRegisterForm();
 
 		login.getWelcomeFrame().addWindowListener((new WindowAdapter() {
 			RequestManager requestManager;
@@ -79,14 +93,12 @@ public class Launcher {
 			}
 		}).init(requestManager));
 
-		//Username and Password
 		JTextField usernameLoginField = Utils.generateTextField("Username...", 185, 131, 206, 36, 10);
 		login.getWelcomePanel().add(usernameLoginField);
 
 		JPasswordField passwordField = Utils.generatePasswordField("Password...", 185, 178, 206, 36, 10);
 		login.getWelcomePanel().add(passwordField);
 
-		//Login request
 		login.getSignInButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -101,6 +113,10 @@ public class Launcher {
 					System.out.println("Login denied");
 				} else if (response.getResCode() == Response.LOGIN_APPROVED) {
 
+					HashMap<String, Object> userData = response.getParameters().get(0);
+					user.setId(userData.get("id").toString()).setUsername(userData.get("username").toString()).setEmail(userData.get("email").toString());
+
+					login.getWelcomeFrame().setVisible(false);
 					app();
 					CardLayout cardLayout = (CardLayout) login.getWelcomeFrame().getContentPane().getLayout();
 					cardLayout.show(login.getWelcomeFrame().getContentPane(), "appPanel");
@@ -112,38 +128,30 @@ public class Launcher {
 		login.getSignUpButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Register register = Register.getInstance().setWelcomeFrame(login.getWelcomeFrame());
-				register.initialize();
-
-				generateRegisterForm(register);
 				CardLayout cardLayout = (CardLayout) login.getWelcomeFrame().getContentPane().getLayout();
 				cardLayout.show(login.getWelcomeFrame().getContentPane(), "registerPanel");
-
 			}
 		});
 
 	}
 
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
 
-	private void generateRegisterForm(Register register) {
+	private void generateRegisterForm() {
 
-		JTextField firstNameField = Utils.generateTextField("First Name...", 201, 113, 163, 20, 10);
-		register.getRegisterPanel().add(firstNameField);
-
-		JTextField lastNameField = Utils.generateTextField("Last Name...", 201, 144, 163, 20, 10);
-		register.getRegisterPanel().add(lastNameField);
-
-		JTextField usernameField = Utils.generateTextField("Username...", 201, 175, 163, 20, 10);
+		JTextField usernameField = Utils.generateTextField("Username...", 201, 113, 163, 20, 10);
 		register.getRegisterPanel().add(usernameField);
 
-		JTextField emailField = Utils.generateTextField("Email...", 201, 206, 163, 20, 10);
+		JTextField emailField = Utils.generateTextField("Email...", 201, 144, 163, 20, 10);
 		register.getRegisterPanel().add(emailField);
 
-		JPasswordField passwordField = Utils.generatePasswordField("Password...", 201, 237, 163, 20, 10);
+		JTextField confEmailField = Utils.generateTextField("Confirm Email...", 201, 175, 163, 20, 10);
+		register.getRegisterPanel().add(confEmailField);
+
+		JPasswordField passwordField = Utils.generatePasswordField("Password...", 201, 206, 163, 20, 10);
 		register.getRegisterPanel().add(passwordField);
 
-		JPasswordField confPasswordField = Utils.generatePasswordField("Password...", 201, 68, 163, 20, 10);
+		JPasswordField confPasswordField = Utils.generatePasswordField("Password...", 201, 237, 163, 20, 10);
 		register.getRegisterPanel().add(confPasswordField);
 
 		register.getCancelButton().addActionListener(new ActionListener() {
@@ -153,28 +161,39 @@ public class Launcher {
 			}
 		});
 
-		//Register request
 		register.getSubmitButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO: implement
+
+				HashMap<String, Object> parameters = new HashMap<>();
+				parameters.put("username", usernameField.getText());
+				parameters.put("email", emailField.getText());
+				parameters.put("password", String.valueOf((passwordField).getPassword()));
+				Response response = requestManager.sendRegisterRequest(parameters);
+
+				if (response.getResCode() == Response.DATABASE_ERROR) {
+					System.out.println("Database error.");
+				} else if (response.getResCode() == Response.REGISTER_ERROR) {
+					System.out.println("Register error.");
+				} else if (response.getResCode() == Response.REGISTER_SUCCESSFUL) {
+					System.out.println("Succes!");
+				}
 			}
 		});
 
 	}
 
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
 
 	private void app() {
 
-		login.getWelcomeFrame().setVisible(false);
-
-		Board board = Board.getInstance();
 		board.initialize();
-		Navigation navigation = Navigation.getInstance();
 		navigation.initialize();
 
-		Utils.generateCategoryList(requestManager, categoriesComboBox, navigation.getNavPanel(), 20, 250, 150, 20);
-		Utils.generateProductList(navigation.getNavPanel(), 20, 280, 150, 20);
+		categories = Utils.generateCategoryList(requestManager);
+		Utils.generateProductList(requestManager, categories);
+
+		String[] allCategories = Utils.parseAllCategories(categories);
+		String[] allProducts = Utils.parseAllProducts(categories);
 
 		JFrame marketFrame = new JFrame();
 		marketFrame.setVisible(true);
@@ -200,14 +219,23 @@ public class Launcher {
 			}
 		}).init(requestManager));
 
+		JComboBox<Object> categoriesComboBox = new JComboBox<Object>(allCategories);
+		//categoriesComboBox.setBounds(b1, b2, b3, b4); //TODO: set bounds
+		categoriesComboBox.setSelectedIndex(0);
+		navigation.getNavPanel().add(categoriesComboBox);
+
+		JComboBox<Object> productsComboBox = new JComboBox<Object>(allProducts);
+		//productsComboBox.setBounds(b1, b2, b3, b4); //TODO: set bounds
+		productsComboBox.setSelectedIndex(0);
+		navigation.getNavPanel().add(productsComboBox);
+
 		navigation.getNewOfferButton().addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 
-				NewOffer newOffer = NewOffer.getInstance();
 				newOffer.initialize();
 
-				addNewOffer(newOffer.getNewOfferPanel());
+				addNewOffer(newOffer.getNewOfferPanel(), allCategories, allProducts);
 				CardLayout cardLayout = (CardLayout) board.getBoardPanel().getLayout();
 				cardLayout.show(board.getBoardPanel(), "newOfferPanel");
 			}
@@ -215,17 +243,17 @@ public class Launcher {
 
 		navigation.getBuyButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO: implement
+				// TODO: implement
 			}
 		});
 
 		navigation.getSellButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO: implement
+				// TODO: implement
 			}
 		});
 
-		//MARKET PANEL
+		// MARKET PANEL
 		JSplitPane marketPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigation.getNavScrollPane(), board.getBoardScrollPanel());
 		marketPanel.setDividerLocation(200);
 		marketPanel.setDividerSize(0);
@@ -233,22 +261,25 @@ public class Launcher {
 
 	}
 
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
 
-	private void addNewOffer(JPanel newOfferPanel) {
+	private void addNewOffer(JPanel newOfferPanel, String[] allCategories, String[] allProducts) {
 
+		JComboBox<Object> categoriesComboBox = new JComboBox<Object>(allCategories);
 		categoriesComboBox.setBounds(170, 210, 150, 20);
 		categoriesComboBox.setSelectedIndex(0);
 		newOfferPanel.add(categoriesComboBox);
 
-		//select product
-		Utils.generateProductList(newOfferPanel, 375, 210, 150, 20);
+		JComboBox<Object> productsComboBox = new JComboBox<Object>(allProducts);
+		productsComboBox.setBounds(170, 250, 150, 20);
+		productsComboBox.setSelectedIndex(0);
+		newOfferPanel.add(productsComboBox);
 
-		//select quantity
+		// select quantity
 		JTextField quantityTextField = Utils.generateTextField(" Quantity...", 198, 280, 100, 30, 10);
 		newOfferPanel.add(quantityTextField);
 
-		//price/piece
+		// price/piece
 		JTextField priceTextField = Utils.generateTextField(" Price / piece ($)", 402, 280, 100, 30, 10);
 		newOfferPanel.add(priceTextField);
 
