@@ -1,5 +1,6 @@
 package networking;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -71,14 +72,21 @@ public class ClientThread implements Runnable {
 					output.writeObject(res);
 					output.flush();
 					break;
+				case Request.GET_PRODUCTS:
+					res = getProductsResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
 
 				}
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				break;
 			} catch (IOException e) {
 				e.printStackTrace();
+				break;
 			}
+
 	}
 
 	public void close() {
@@ -99,8 +107,6 @@ public class ClientThread implements Runnable {
 	private Response getLoginResponse(Request req) {
 		String username = req.getParameters().get("username").toString();
 		String password = req.getParameters().get("password").toString();
-
-
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.login(username, password);
 
 		Response res;
@@ -119,7 +125,6 @@ public class ClientThread implements Runnable {
 		String username = req.getParameters().get("username").toString();
 		String password = req.getParameters().get("password").toString();
 		String email = req.getParameters().get("email").toString();
-		dbManager.connect();
 
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.register(username, password, email);
 		Response res;
@@ -136,9 +141,6 @@ public class ClientThread implements Runnable {
 	// -------------------------------------------------------------------------------------//
 
 	private Response getCategoryResponse(Request req) {
-
-		System.out.println("AIIC");
-		dbManager.connect();
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.getCategories();
 		Response res;
 		if (resultParams.size() != 0) {
@@ -153,10 +155,23 @@ public class ClientThread implements Runnable {
 	// -------------------------------------------------------------------------------------//
 
 	private Response getProductsByCategoryResponse(Request req) {
-
 		int categoryId = Integer.parseInt(req.getParameters().get("categoryId").toString());
-		dbManager.connect();
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.getProductsByCategory(categoryId);
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_PRODUCTS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getProductsResponse(Request req) {
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.getProducts();
 
 		Response res;
 		if (resultParams.size() != 0) {

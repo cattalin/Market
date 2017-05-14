@@ -131,19 +131,6 @@ public class DatabaseManager {
 			user.put("password", password);
 			System.out.println("successfuly inserted user");
 
-			// // Display values
-			// System.out.println(
-			// "Got from database: " + id + " " + createTime + " " + email + " "
-			// + usern + " " + pass);
-			//
-			// HashMap<String, Object> user = new HashMap<>();
-			// user.put("success", "true");//TODO REMOVE THIS AND REWORK THE
-			// RESPONSE CLASS
-			// user.put("id", id);
-			// user.put("createTime", createTime);
-			// user.put("email", email);
-			// user.put("username", usern);
-			// user.put("password", pass)
 
 			result.add(user);
 
@@ -170,12 +157,13 @@ public class DatabaseManager {
 				int id = rs.getInt("categoryId");
 				String name = rs.getString("name");
 
-				HashMap<String, Object> user = new HashMap<>();
-				user.put("success", "true");// TODO REMOVE THIS AND REWORK THE
-											// RESPONSE CLASS
-				user.put("name", name);
-				user.put("categoryId", id);
-				result.add(user);
+				HashMap<String, Object> category = new HashMap<>();
+				category.put("success", "true");// TODO REMOVE THIS AND REWORK
+												// THE
+				// RESPONSE CLASS
+				category.put("name", name);
+				category.put("categoryId", id);
+				result.add(category);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -205,18 +193,101 @@ public class DatabaseManager {
 				String productName = rs.getString("products.name");
 				String categoryName = rs.getString("categories.name");
 
-				HashMap<String, Object> user = new HashMap<>();
-				user.put("success", "true");// TODO REMOVE THIS AND REWORK THE
-											// RESPONSE CLASS
-				user.put("productId", productId);
-				user.put("productName", productName);
-				user.put("categoryName", categoryName);
-				result.add(user);
+				HashMap<String, Object> product = new HashMap<>();
+				product.put("success", "true");// TODO REMOVE THIS AND REWORK
+												// THE
+												// RESPONSE CLASS
+				product.put("productId", productId);
+				product.put("productName", productName);
+				product.put("categoryName", categoryName);
+				result.add(product);
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return result;
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	public ArrayList<HashMap<String, Object>> getProducts() {
+
+		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
+		try {
+			String command = "SELECT * FROM products INNER JOIN categories ON categories.categoryId = products.categoryId";
+
+			PreparedStatement preparedStatement = connection.prepareStatement(command);
+
+			ResultSet rs = preparedStatement.executeQuery();
+
+			while (rs.next()) {
+				// Retrieve by column name
+				int productId = rs.getInt("productId");
+				int categoryId = rs.getInt("categoryId");
+				String productName = rs.getString("products.name");
+				String categoryName = rs.getString("categories.name");
+
+				HashMap<String, Object> product = new HashMap<>();
+				product.put("success", "true");// TODO REMOVE THIS AND REWORK
+												// THE RESPONSE CLASS
+				product.put("categoryId", categoryId);
+				product.put("productId", productId);
+				product.put("productName", productName);
+				product.put("categoryName", categoryName);
+				result.add(product);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public ArrayList<HashMap<String, Object>> createBuyingOffer(int quantity, int totalPrice, int unitPrice,
+			int categoryId, int productId, int buyerId) {
+		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
+
+
+		if (totalPrice == quantity * unitPrice) {
+			try {
+				String command = "INSERT INTO buying_offers"
+						+ "(quantity, totalPrice, unitPrice, categoryId, productId, buyerId) VALUES" + "(?,?,?,?,?,?)";
+
+				PreparedStatement preparedStatement = connection.prepareStatement(command);
+				preparedStatement.setInt(1, quantity);
+				preparedStatement.setInt(2, totalPrice);
+				preparedStatement.setInt(3, unitPrice);
+				preparedStatement.setInt(4, categoryId);
+				preparedStatement.setInt(5, productId);
+				preparedStatement.setInt(6, buyerId);
+
+				preparedStatement.executeUpdate();
+
+				HashMap<String, Object> response = new HashMap<>();
+				response.put("success", "true");// TODO REMOVE THIS AND REWORK
+												// THE
+				// RESPONSE CLASS
+				response.put("quantity", quantity);
+				response.put("totalPrice", totalPrice);
+				response.put("unitPrice", unitPrice);
+				response.put("categoryId", categoryId);
+				response.put("productId", productId);
+				response.put("buyerId", buyerId);
+				System.out.println("successfuly inserted buying offer");
+
+
+				result.add(response);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+			HashMap<String, Object> response = new HashMap<>();
+			response.put("success", "false");// TODO REMOVE THIS AND REWORK THE
+			result.add(response);
+		}
+
 		return result;
 	}
 
