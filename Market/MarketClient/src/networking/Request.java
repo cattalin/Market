@@ -32,7 +32,6 @@ public class Request implements Serializable {
 		this.parameters = params;
 	}
 
-
 	public int getReqCode() {
 		return reqCode;
 	}
@@ -40,8 +39,6 @@ public class Request implements Serializable {
 	public HashMap<String, Object> getParameters() {
 		return parameters;
 	}
-
-
 
 	public String toString() {
 		String result = "";
@@ -55,30 +52,40 @@ public class Request implements Serializable {
 		case GET_PRODUCTS:
 			result += "GET_PRODUCTS";
 			break;
-			case GET_PRODUCTS_BY_CATEGORY : 
-				result += "GET_PRODUCTS_BY_CATEGORY";break; 
-			case GET_CATEGORIES : 
-				result += "GET_CATEGORIES";break; 
-			case GET_BUYING_OFFERS :
-				result += "GET_BUYING_OFFERS";break; 
-			case GET_BUYING_OFFERS_BY_CATEGORY : 
-				result += "GET_BUYING_OFFERS_BY_CATEGORY";break;
-			case GET_BUYING_OFFERS_BY_PRODUCT : 
-				result += "GET_BUYING_OFFERS_BY_PRODUCT";break; 
-			case GET_SELLING_OFFERS : 
-				result += "GET_SELLING_OFFERS";break; 
-			case GET_SELLING_OFFERS_BY_CATEGORY : 
-				result += "GET_SELLING_OFFERS_BY_CATEGORY";break;
-			case GET_SELLING_OFFERS_BY_PRODUCT :
-				result += "GET_SELLING_OFFERS_BY_PRODUCT";break; 
+		case GET_PRODUCTS_BY_CATEGORY:
+			result += "GET_PRODUCTS_BY_CATEGORY";
+			break;
+		case GET_CATEGORIES:
+			result += "GET_CATEGORIES";
+			break;
+		case GET_BUYING_OFFERS:
+			result += "GET_BUYING_OFFERS";
+			break;
+		case GET_BUYING_OFFERS_BY_CATEGORY:
+			result += "GET_BUYING_OFFERS_BY_CATEGORY";
+			break;
+		case GET_BUYING_OFFERS_BY_PRODUCT:
+			result += "GET_BUYING_OFFERS_BY_PRODUCT";
+			break;
+		case GET_SELLING_OFFERS:
+			result += "GET_SELLING_OFFERS";
+			break;
+		case GET_SELLING_OFFERS_BY_CATEGORY:
+			result += "GET_SELLING_OFFERS_BY_CATEGORY";
+			break;
+		case GET_SELLING_OFFERS_BY_PRODUCT:
+			result += "GET_SELLING_OFFERS_BY_PRODUCT";
+			break;
 
-			case CREATE_BUYING_OFFER : 
-				result += "CREATE_BUYING_OFFER";break; 
-			case CREATE_SELLING_OFFER : 
-				result += "CREATE_SELLING_OFFER";break; 
+		case CREATE_BUYING_OFFER:
+			result += "CREATE_BUYING_OFFER";
+			break;
+		case CREATE_SELLING_OFFER:
+			result += "CREATE_SELLING_OFFER";
+			break;
 		}
 		result += " request with the parameters ";
-		if(parameters!=null)
+		if (parameters != null)
 			result += parameters.toString();
 		return result;
 	}

@@ -1,6 +1,7 @@
 package models;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Category {
 
@@ -8,36 +9,42 @@ public class Category {
 	//Instance fields
 	//-------------------------------------------------------------------------------------//
 
-	private final String NAME;
-	private final String ID;
-	private ArrayList<Product> products = new ArrayList<Product>();
+	private final String name;
+	private final String id;
+	private Map<String, Product> products = new HashMap<String, Product>();
 
 	//-------------------------------------------------------------------------------------//
 	//Constructor
 	//-------------------------------------------------------------------------------------//
 
 	public Category(String id, String name) {
-		ID = id;
-		NAME = name;
+		this.id = id;
+		this.name = name;
 	}
 
 	//-------------------------------------------------------------------------------------//
 	//Instance methods
 	//-------------------------------------------------------------------------------------//
 
+	public String getId() {
+		return id;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
 	public String getName() {
-		return NAME;
+		return name;
 	}
 
 	//-------------------------------------------------------------------------------------//
 
 	public void addProduct(Product product) {
-		products.add(product);
+		products.put(product.getName(), product);
 	}
 
 	//-------------------------------------------------------------------------------------//
 
-	public ArrayList<Product> getProducts() {
+	public Map<String, Product> getProducts() {
 		return products;
 	}
 
@@ -45,7 +52,7 @@ public class Category {
 
 	@Override
 	public String toString() {
-		return "Category [ID = " + ID + ", NAME=" + NAME + ", products=" + products + "]";
+		return "Category [id = " + id + ", name=" + name + ", products=" + products + "]";
 	}
 
 }
