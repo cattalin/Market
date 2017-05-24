@@ -78,6 +78,7 @@ public class DatabaseManager {
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
+
 				// Retrieve by column name
 				int id = rs.getInt("userId");
 				Object createTime = rs.getTimestamp("create_time");
@@ -275,6 +276,53 @@ public class DatabaseManager {
 				response.put("productId", productId);
 				response.put("buyerId", buyerId);
 				System.out.println("successfuly inserted buying offer");
+
+
+				result.add(response);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+			HashMap<String, Object> response = new HashMap<>();
+			response.put("success", "false");// TODO REMOVE THIS AND REWORK THE
+			result.add(response);
+		}
+
+		return result;
+	}
+
+	public ArrayList<HashMap<String, Object>> createSellingOffer(int quantity, int totalPrice, int unitPrice,
+			int categoryId, int productId, int sellerId) {
+		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
+
+
+		if (totalPrice == quantity * unitPrice) {
+			try {
+				String command = "INSERT INTO selling_offers"
+						+ "(quantity, totalPrice, unitPrice, categoryId, productId, sellerId) VALUES" + "(?,?,?,?,?,?)";
+
+				PreparedStatement preparedStatement = connection.prepareStatement(command);
+				preparedStatement.setInt(1, quantity);
+				preparedStatement.setInt(2, totalPrice);
+				preparedStatement.setInt(3, unitPrice);
+				preparedStatement.setInt(4, categoryId);
+				preparedStatement.setInt(5, productId);
+				preparedStatement.setInt(6, sellerId);
+
+				preparedStatement.executeUpdate();
+
+				HashMap<String, Object> response = new HashMap<>();
+				response.put("success", "true");// TODO REMOVE THIS AND REWORK
+												// THE
+				// RESPONSE CLASS
+				response.put("quantity", quantity);
+				response.put("totalPrice", totalPrice);
+				response.put("unitPrice", unitPrice);
+				response.put("categoryId", categoryId);
+				response.put("productId", productId);
+				response.put("sellerId", sellerId);
+				System.out.println("successfuly inserted selling offer");
 
 
 				result.add(response);

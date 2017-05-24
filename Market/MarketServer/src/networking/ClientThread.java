@@ -77,6 +77,16 @@ public class ClientThread implements Runnable {
 					output.writeObject(res);
 					output.flush();
 					break;
+				case Request.CREATE_BUYING_OFFER:
+					res = getCreateBuyingOfferResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.CREATE_SELLING_OFFER:
+					res = getCreateSellingOfferResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
 
 				}
 			} catch (ClassNotFoundException e) {
@@ -182,5 +192,51 @@ public class ClientThread implements Runnable {
 		return res;
 
 	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getCreateBuyingOfferResponse(Request req) {
+		int quantity = (Integer) req.getParameters().get("quantity");
+		int totalPrice = (Integer) req.getParameters().get("totalPrice");
+		int unitPrice = (Integer) req.getParameters().get("unitPrice");
+		int categoryId = (Integer) req.getParameters().get("categoryId");
+		int productId = (Integer) req.getParameters().get("productId");
+		int buyerId = (Integer) req.getParameters().get("buyerId");
+
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.createBuyingOffer(quantity, totalPrice, unitPrice,
+				categoryId, productId, buyerId);
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_BUYING_OFFERS);// TODO remove this
+															// dummy response
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+
+		return res;
+
+	}
+
+	private Response getCreateSellingOfferResponse(Request req) {
+		int quantity = (Integer) req.getParameters().get("quantity");
+		int totalPrice = (Integer) req.getParameters().get("totalPrice");
+		int unitPrice = (Integer) req.getParameters().get("unitPrice");
+		int categoryId = (Integer) req.getParameters().get("categoryId");
+		int productId = (Integer) req.getParameters().get("productId");
+		int sellerId = (Integer) req.getParameters().get("sellerId");
+
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.createBuyingOffer(quantity, totalPrice, unitPrice,
+				categoryId, productId, sellerId);
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_SELLING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+
+		return res;
+
+	}
+
 
 }

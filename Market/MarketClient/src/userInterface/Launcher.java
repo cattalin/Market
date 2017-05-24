@@ -22,31 +22,32 @@ import networking.Response;
 
 public class Launcher {
 
-	//-------------------------------------------------------------------------------------//
-	//Instance fields
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
+	// Instance fields
+	// -------------------------------------------------------------------------------------//
 
 	private JComboBox<Object> categoriesComboBox;
 
 	private RequestManager requestManager;
 	private Login login;
-	private User user; //TODO: fix
+	private User user; // TODO: fix
 
-	//-------------------------------------------------------------------------------------//
-	//Constructor
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
+	// Constructor
+	// -------------------------------------------------------------------------------------//
 
 	public Launcher() {
 		requestManager = RequestManager.getInstance();
 		initialize();
 	}
 
-	//-------------------------------------------------------------------------------------//
-	//Instance methods
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
+	// Instance methods
+	// -------------------------------------------------------------------------------------//
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					Launcher window = new Launcher();
@@ -58,7 +59,7 @@ public class Launcher {
 		});
 	}
 
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
 
 	private void initialize() {
 
@@ -73,21 +74,23 @@ public class Launcher {
 				return this;
 			}
 
+			@Override
 			public void windowClosing(WindowEvent winEvt) {
 				this.requestManager.closeConnection();
 				System.exit(0);
 			}
 		}).init(requestManager));
 
-		//Username and Password
+		// Username and Password
 		JTextField usernameLoginField = Utils.generateTextField("Username...", 185, 131, 206, 36, 10);
 		login.getWelcomePanel().add(usernameLoginField);
 
 		JPasswordField passwordField = Utils.generatePasswordField("Password...", 185, 178, 206, 36, 10);
 		login.getWelcomePanel().add(passwordField);
 
-		//Login request
+		// Login request
 		login.getSignInButton().addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				HashMap<String, Object> parameters = new HashMap<>();
@@ -110,6 +113,7 @@ public class Launcher {
 		});
 
 		login.getSignUpButton().addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				Register register = Register.getInstance().setWelcomeFrame(login.getWelcomeFrame());
@@ -124,7 +128,7 @@ public class Launcher {
 
 	}
 
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
 
 	private void generateRegisterForm(Register register) {
 
@@ -147,22 +151,24 @@ public class Launcher {
 		register.getRegisterPanel().add(confPasswordField);
 
 		register.getCancelButton().addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cardLayout = (CardLayout) login.getWelcomeFrame().getContentPane().getLayout();
 				cardLayout.show(login.getWelcomeFrame().getContentPane(), "welcomePanel");
 			}
 		});
 
-		//Register request
+		// Register request
 		register.getSubmitButton().addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO: implement
+				// TODO: implement
 			}
 		});
 
 	}
 
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
 
 	private void app() {
 
@@ -194,6 +200,7 @@ public class Launcher {
 				return this;
 			}
 
+			@Override
 			public void windowClosing(WindowEvent winEvt) {
 				this.requestManager.closeConnection();
 				System.exit(0);
@@ -202,6 +209,7 @@ public class Launcher {
 
 		navigation.getNewOfferButton().addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				NewOffer newOffer = NewOffer.getInstance();
@@ -214,26 +222,29 @@ public class Launcher {
 		});
 
 		navigation.getBuyButton().addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO: implement
+				// TODO: implement
 			}
 		});
 
 		navigation.getSellButton().addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO: implement
+				// TODO: implement
 			}
 		});
 
-		//MARKET PANEL
-		JSplitPane marketPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigation.getNavScrollPane(), board.getBoardScrollPanel());
+		// MARKET PANEL
+		JSplitPane marketPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigation.getNavScrollPane(),
+				board.getBoardScrollPanel());
 		marketPanel.setDividerLocation(200);
 		marketPanel.setDividerSize(0);
 		marketFrame.getContentPane().add(marketPanel, "marketPanel");
 
 	}
 
-	//-------------------------------------------------------------------------------------//
+	// -------------------------------------------------------------------------------------//
 
 	private void addNewOffer(JPanel newOfferPanel) {
 
@@ -241,14 +252,14 @@ public class Launcher {
 		categoriesComboBox.setSelectedIndex(0);
 		newOfferPanel.add(categoriesComboBox);
 
-		//select product
+		// select product
 		Utils.generateProductList(newOfferPanel, 375, 210, 150, 20);
 
-		//select quantity
+		// select quantity
 		JTextField quantityTextField = Utils.generateTextField(" Quantity...", 198, 280, 100, 30, 10);
 		newOfferPanel.add(quantityTextField);
 
-		//price/piece
+		// price/piece
 		JTextField priceTextField = Utils.generateTextField(" Price / piece ($)", 402, 280, 100, 30, 10);
 		newOfferPanel.add(priceTextField);
 
