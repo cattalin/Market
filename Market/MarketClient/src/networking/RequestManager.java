@@ -197,6 +197,69 @@ public class RequestManager {
 
 	//-------------------------------------------------------------------------------------//
 
+	public Response sendBuyingOffersRequest(HashMap<String, Object> parameters) {
+
+		Request req = new Request(Request.GET_BUYING_OFFERS);
+		req.setParameters(parameters);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public Response sendSellingOffersRequest(HashMap<String, Object> parameters) {
+
+		Request req = new Request(Request.GET_SELLING_OFFERS);
+		req.setParameters(parameters);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public Response sendAcceptOfferRequest(HashMap<String, Object> parameters) {
+
+		Request req = new Request(Request.GET_SELLING_OFFERS);
+		req.setParameters(parameters);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
 	public void closeConnection() {
 		try {
 			in.close();

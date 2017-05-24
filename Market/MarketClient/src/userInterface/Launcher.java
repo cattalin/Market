@@ -183,14 +183,17 @@ public class Launcher {
 					System.out.println("Register error.");
 				} else if (response.getResCode() == Response.REGISTER_SUCCESSFUL) {
 					System.out.println("Succes!");
+					CardLayout cardLayout = (CardLayout) login.getWelcomeFrame().getContentPane().getLayout();
+					cardLayout.show(login.getWelcomeFrame().getContentPane(), "welcomePanel");
 				}
+
 			}
 		});
 
 	}
 
 	// -------------------------------------------------------------------------------------//
-	//TODO: refactor
+
 	private void app() {
 
 		login.getWelcomeFrame().setVisible(false);
@@ -251,8 +254,9 @@ public class Launcher {
 				productsComboBox.removeAllItems();
 
 				if (categoriesComboBox.getSelectedIndex() != 0) {
+					productsComboBox.insertItemAt("Select...", 0);
 
-					int i = 0;
+					int i = 1;
 					for (Product product : categories.get(categoriesComboBox.getSelectedItem().toString()).getProducts()
 							.values()) {
 						productsComboBox.insertItemAt(product.getName(), i++);
@@ -260,8 +264,8 @@ public class Launcher {
 					productsComboBox.setSelectedIndex(0);
 
 				} else {
-
-					int i = 0;
+					productsComboBox.insertItemAt("Select...", 0);
+					int i = 1;
 					for (Category category : categories.values())
 						for (Product product : category.getProducts().values())
 							productsComboBox.insertItemAt(product.getName(), i++);
@@ -286,18 +290,63 @@ public class Launcher {
 		navigation.getBuyButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				buyingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
-						productsComboBox.getSelectedItem().toString());
+				Category categoryChosen = categories.get(categoriesComboBox.getSelectedItem());
+
+				Product productChosen = null;
+				if (categoryChosen != null)
+					productChosen = categoryChosen.getProducts().get(productsComboBox.getSelectedItem());
+
+				int categoryId = categoryChosen == null ? 0 : Integer.parseInt(categoryChosen.getId());
+				int productId = productChosen == null ? 0 : Integer.parseInt(productChosen.getId());
+
+				HashMap<String, Object> parameters = new HashMap<String, Object>();
+				parameters.put("categoryId", categoryId);
+				parameters.put("productId", productId);
+
+				Response response = requestManager.sendBuyingOffersRequest(parameters);
+
+				if (response.getResCode() == Response.GET_BUYING_OFFERS) {
+					buyingOffers.setParameters(response.getParameters());
+					buyingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
+							productsComboBox.getSelectedItem().toString());
+				} else {
+					buyingOffers.setParameters(null);
+					buyingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
+							productsComboBox.getSelectedItem().toString());
+				}
 
 				CardLayout cardLayout = (CardLayout) board.getBoardPanel().getLayout();
-				cardLayout.show(board.getBoardPanel(), "buyingOffersPanel");
+				cardLayout.show(board.getBoardPanel(), "sellingOffersScrollP");
 			}
 		});
 
 		navigation.getSellButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				sellingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
-						productsComboBox.getSelectedItem().toString());
+
+				Category categoryChosen = categories.get(categoriesComboBox.getSelectedItem());
+
+				Product productChosen = null;
+				if (categoryChosen != null)
+					productChosen = categoryChosen.getProducts().get(productsComboBox.getSelectedItem());
+
+				int categoryId = categoryChosen == null ? 0 : Integer.parseInt(categoryChosen.getId());
+				int productId = productChosen == null ? 0 : Integer.parseInt(productChosen.getId());
+
+				HashMap<String, Object> parameters = new HashMap<String, Object>();
+				parameters.put("categoryId", categoryId);
+				parameters.put("productId", productId);
+
+				Response response = requestManager.sendSellingOffersRequest(parameters);
+
+				if (response.getResCode() == Response.GET_SELLING_OFFERS) {
+					sellingOffers.setParameters(response.getParameters());
+					sellingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
+							productsComboBox.getSelectedItem().toString());
+				} else {
+					sellingOffers.setParameters(null);
+					sellingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
+							productsComboBox.getSelectedItem().toString());
+				}
 
 				CardLayout cardLayout = (CardLayout) board.getBoardPanel().getLayout();
 				cardLayout.show(board.getBoardPanel(), "sellingOffersScrollP");
@@ -344,8 +393,9 @@ public class Launcher {
 				productsComboBox.removeAllItems();
 
 				if (categoriesComboBox.getSelectedIndex() != 0) {
+					productsComboBox.insertItemAt("Select...", 0);
 
-					int i = 0;
+					int i = 1;
 					for (Product product : categories.get(categoriesComboBox.getSelectedItem().toString()).getProducts()
 							.values()) {
 						productsComboBox.insertItemAt(product.getName(), i++);
@@ -353,8 +403,8 @@ public class Launcher {
 					productsComboBox.setSelectedIndex(0);
 
 				} else {
-
-					int i = 0;
+					productsComboBox.insertItemAt("Select...", 0);
+					int i = 1;
 					for (Category category : categories.values())
 						for (Product product : category.getProducts().values())
 							productsComboBox.insertItemAt(product.getName(), i++);
