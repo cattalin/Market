@@ -19,7 +19,7 @@ public class User {
 	private User() {
 	}
 
-	public User getInstance() {
+	public static User getInstance() {
 		return user;
 	}
 

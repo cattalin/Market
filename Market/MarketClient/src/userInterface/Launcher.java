@@ -17,6 +17,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
 import models.Category;
+import models.Product;
 import models.User;
 import networking.RequestManager;
 import networking.Response;
@@ -37,6 +38,8 @@ public class Launcher {
 	private Board board;
 	private Navigation navigation;
 	private NewOffer newOffer;
+	private SellingOffers sellingOffers;
+	private BuyingOffers buyingOffers;
 
 	// -------------------------------------------------------------------------------------//
 	// Constructor
@@ -50,6 +53,9 @@ public class Launcher {
 		newOffer = NewOffer.getInstance();
 		login = Login.getInstance();
 		board = Board.getInstance();
+		user = User.getInstance();
+		sellingOffers = SellingOffers.getInstance();
+		buyingOffers = BuyingOffers.getInstance();
 
 		initialize();
 	}
@@ -114,9 +120,10 @@ public class Launcher {
 				} else if (response.getResCode() == Response.LOGIN_APPROVED) {
 
 					HashMap<String, Object> userData = response.getParameters().get(0);
-					user.setId(userData.get("id").toString()).setUsername(userData.get("username").toString()).setEmail(userData.get("email").toString());
 
-					login.getWelcomeFrame().setVisible(false);
+					user.setId(userData.get("id").toString()).setUsername(userData.get("username").toString())
+							.setEmail(userData.get("email").toString());
+
 					app();
 					CardLayout cardLayout = (CardLayout) login.getWelcomeFrame().getContentPane().getLayout();
 					cardLayout.show(login.getWelcomeFrame().getContentPane(), "appPanel");
@@ -183,17 +190,16 @@ public class Launcher {
 	}
 
 	// -------------------------------------------------------------------------------------//
-
+	//TODO: refactor
 	private void app() {
 
+		login.getWelcomeFrame().setVisible(false);
+
 		board.initialize();
-		navigation.initialize();
+		navigation.initialize(user.getUsername());
 
 		categories = Utils.generateCategoryList(requestManager);
 		Utils.generateProductList(requestManager, categories);
-
-		String[] allCategories = Utils.parseAllCategories(categories);
-		String[] allProducts = Utils.parseAllProducts(categories);
 
 		JFrame marketFrame = new JFrame();
 		marketFrame.setVisible(true);
@@ -219,15 +225,51 @@ public class Launcher {
 			}
 		}).init(requestManager));
 
-		JComboBox<Object> categoriesComboBox = new JComboBox<Object>(allCategories);
-		//categoriesComboBox.setBounds(b1, b2, b3, b4); //TODO: set bounds
+		JComboBox<Object> categoriesComboBox = new JComboBox<Object>();
+		categoriesComboBox.setBounds(20, 240, 150, 25);
+		categoriesComboBox.insertItemAt("Select...", 0);
 		categoriesComboBox.setSelectedIndex(0);
 		navigation.getNavPanel().add(categoriesComboBox);
+		int i = 0;
+		for (Category category : categories.values())
+			categoriesComboBox.insertItemAt(category.getName(), i + 1);
 
-		JComboBox<Object> productsComboBox = new JComboBox<Object>(allProducts);
-		//productsComboBox.setBounds(b1, b2, b3, b4); //TODO: set bounds
+		JComboBox<Object> productsComboBox = new JComboBox<Object>();
+		productsComboBox.setBounds(20, 280, 150, 25);
+		productsComboBox.insertItemAt("Select...", 0);
 		productsComboBox.setSelectedIndex(0);
 		navigation.getNavPanel().add(productsComboBox);
+		i = 1;
+		for (Category category : categories.values())
+			for (Product product : category.getProducts().values())
+				productsComboBox.insertItemAt(product.getName(), i);
+
+		categoriesComboBox.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				productsComboBox.removeAllItems();
+
+				if (categoriesComboBox.getSelectedIndex() != 0) {
+
+					int i = 0;
+					for (Product product : categories.get(categoriesComboBox.getSelectedItem().toString()).getProducts()
+							.values()) {
+						productsComboBox.insertItemAt(product.getName(), i++);
+					}
+					productsComboBox.setSelectedIndex(0);
+
+				} else {
+
+					int i = 0;
+					for (Category category : categories.values())
+						for (Product product : category.getProducts().values())
+							productsComboBox.insertItemAt(product.getName(), i++);
+					productsComboBox.setSelectedIndex(0);
+
+				}
+			}
+		});
 
 		navigation.getNewOfferButton().addActionListener(new ActionListener() {
 
@@ -235,7 +277,7 @@ public class Launcher {
 
 				newOffer.initialize();
 
-				addNewOffer(newOffer.getNewOfferPanel(), allCategories, allProducts);
+				addNewOffer(newOffer.getNewOfferPanel());
 				CardLayout cardLayout = (CardLayout) board.getBoardPanel().getLayout();
 				cardLayout.show(board.getBoardPanel(), "newOfferPanel");
 			}
@@ -243,18 +285,28 @@ public class Launcher {
 
 		navigation.getBuyButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: implement
+
+				buyingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
+						productsComboBox.getSelectedItem().toString());
+
+				CardLayout cardLayout = (CardLayout) board.getBoardPanel().getLayout();
+				cardLayout.show(board.getBoardPanel(), "buyingOffersPanel");
 			}
 		});
 
 		navigation.getSellButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: implement
+				sellingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
+						productsComboBox.getSelectedItem().toString());
+
+				CardLayout cardLayout = (CardLayout) board.getBoardPanel().getLayout();
+				cardLayout.show(board.getBoardPanel(), "sellingOffersScrollP");
 			}
 		});
 
 		// MARKET PANEL
-		JSplitPane marketPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigation.getNavScrollPane(), board.getBoardScrollPanel());
+		JSplitPane marketPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigation.getNavScrollPane(),
+				board.getBoardPanel());
 		marketPanel.setDividerLocation(200);
 		marketPanel.setDividerSize(0);
 		marketFrame.getContentPane().add(marketPanel, "marketPanel");
@@ -263,17 +315,54 @@ public class Launcher {
 
 	// -------------------------------------------------------------------------------------//
 
-	private void addNewOffer(JPanel newOfferPanel, String[] allCategories, String[] allProducts) {
+	private void addNewOffer(JPanel newOfferPanel) {
 
-		JComboBox<Object> categoriesComboBox = new JComboBox<Object>(allCategories);
+		JComboBox<Object> categoriesComboBox = new JComboBox<Object>();
 		categoriesComboBox.setBounds(170, 210, 150, 20);
+		categoriesComboBox.insertItemAt("Select...", 0);
 		categoriesComboBox.setSelectedIndex(0);
 		newOfferPanel.add(categoriesComboBox);
+		int i = 1;
+		for (Category category : categories.values())
+			categoriesComboBox.insertItemAt(category.getName(), i);
 
-		JComboBox<Object> productsComboBox = new JComboBox<Object>(allProducts);
-		productsComboBox.setBounds(170, 250, 150, 20);
+		JComboBox<Object> productsComboBox = new JComboBox<Object>();
+		productsComboBox.setBounds(373, 210, 150, 20);
+		productsComboBox.insertItemAt("Select...", 0);
 		productsComboBox.setSelectedIndex(0);
 		newOfferPanel.add(productsComboBox);
+
+		i = 1;
+		for (Category category : categories.values())
+			for (Product product : category.getProducts().values())
+				productsComboBox.insertItemAt(product.getName(), i);
+
+		categoriesComboBox.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				productsComboBox.removeAllItems();
+
+				if (categoriesComboBox.getSelectedIndex() != 0) {
+
+					int i = 0;
+					for (Product product : categories.get(categoriesComboBox.getSelectedItem().toString()).getProducts()
+							.values()) {
+						productsComboBox.insertItemAt(product.getName(), i++);
+					}
+					productsComboBox.setSelectedIndex(0);
+
+				} else {
+
+					int i = 0;
+					for (Category category : categories.values())
+						for (Product product : category.getProducts().values())
+							productsComboBox.insertItemAt(product.getName(), i++);
+					productsComboBox.setSelectedIndex(0);
+
+				}
+			}
+		});
 
 		// select quantity
 		JTextField quantityTextField = Utils.generateTextField(" Quantity...", 198, 280, 100, 30, 10);
@@ -282,6 +371,49 @@ public class Launcher {
 		// price/piece
 		JTextField priceTextField = Utils.generateTextField(" Price / piece ($)", 402, 280, 100, 30, 10);
 		newOfferPanel.add(priceTextField);
+
+		newOffer.getBuyingButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				Category categoryChosen = categories.get(categoriesComboBox.getSelectedItem());
+				Product productChosen = categoryChosen.getProducts().get(productsComboBox.getSelectedItem());
+				int quantity = Integer.parseInt(quantityTextField.getText());
+				int unitPrice = Integer.parseInt(priceTextField.getText());
+
+				HashMap<String, Object> parameters = new HashMap<String, Object>();
+				parameters.put("categoryId", Integer.parseInt(categoryChosen.getId()));
+				parameters.put("productId", Integer.parseInt(productChosen.getId()));
+				parameters.put("quantity", quantity);
+				parameters.put("unitPrice", unitPrice);
+				parameters.put("totalPrice", quantity * unitPrice);
+				parameters.put("buyerId", Integer.parseInt(user.getId()));
+
+				Response response = requestManager.sendBuyingOfferRequest(parameters);
+				//TODO: process response
+
+			}
+		});
+
+		newOffer.getSellingButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				Category categoryChosen = categories.get(categoriesComboBox.getSelectedItem());
+				Product productChosen = categoryChosen.getProducts().get(productsComboBox.getSelectedItem());
+				int quantity = Integer.parseInt(quantityTextField.getText());
+				int unitPrice = Integer.parseInt(priceTextField.getText());
+
+				HashMap<String, Object> parameters = new HashMap<String, Object>();
+				parameters.put("categoryId", Integer.parseInt(categoryChosen.getId()));
+				parameters.put("productId", Integer.parseInt(productChosen.getId()));
+				parameters.put("quantity", quantity);
+				parameters.put("unitPrice", unitPrice);
+				parameters.put("totalPrice", quantity * unitPrice);
+				parameters.put("sellerId", Integer.parseInt(user.getId()));
+
+				Response response = requestManager.sendSellingOfferRequest(parameters);
+				//TODO: process response
+			}
+		});
 
 	}
 

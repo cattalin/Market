@@ -1,6 +1,7 @@
 package models;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Category {
 
@@ -10,7 +11,7 @@ public class Category {
 
 	private final String name;
 	private final String id;
-	private ArrayList<Product> products = new ArrayList<Product>();
+	private Map<String, Product> products = new HashMap<String, Product>();
 
 	//-------------------------------------------------------------------------------------//
 	//Constructor
@@ -24,11 +25,11 @@ public class Category {
 	//-------------------------------------------------------------------------------------//
 	//Instance methods
 	//-------------------------------------------------------------------------------------//
-	
+
 	public String getId() {
 		return id;
 	}
-	
+
 	//-------------------------------------------------------------------------------------//
 
 	public String getName() {
@@ -38,12 +39,12 @@ public class Category {
 	//-------------------------------------------------------------------------------------//
 
 	public void addProduct(Product product) {
-		products.add(product);
+		products.put(product.getName(), product);
 	}
 
 	//-------------------------------------------------------------------------------------//
 
-	public ArrayList<Product> getProducts() {
+	public Map<String, Product> getProducts() {
 		return products;
 	}
 

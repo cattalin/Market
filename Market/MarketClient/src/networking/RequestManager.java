@@ -96,8 +96,26 @@ public class RequestManager {
 
 	public Response sendGetCategoriesRequest() {
 
-		System.out.println("Getting categories...");
 		Request req = new Request(Request.GET_CATEGORIES);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public Response sentGetProductsRequest() {
+
+		Request req = new Request(Request.GET_PRODUCTS);
 
 		try {
 			out.writeObject(req);
@@ -115,10 +133,53 @@ public class RequestManager {
 
 	//-------------------------------------------------------------------------------------//
 
-	public Response sentGetProductsRequest() {
+	public Response sentGetProductsByCategoryRequest(HashMap<String, Object> parameters) {
 
-		System.out.println("Getting products...");
-		Request req = new Request(Request.GET_PRODUCTS);
+		System.out.println("Getting products by categoryId= " + parameters.get("categoryId"));
+		Request req = new Request(Request.GET_PRODUCTS_BY_CATEGORY);
+		req.setParameters(parameters);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public Response sendBuyingOfferRequest(HashMap<String, Object> parameters) {
+
+		Request req = new Request(Request.CREATE_BUYING_OFFER);
+		req.setParameters(parameters);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public Response sendSellingOfferRequest(HashMap<String, Object> parameters) {
+
+		Request req = new Request(Request.CREATE_SELLING_OFFER);
+		req.setParameters(parameters);
 
 		try {
 			out.writeObject(req);

@@ -24,8 +24,9 @@ class Utils {
 		if (response.getResCode() == Response.GET_CATEGORIES) {
 
 			for (HashMap<String, Object> currentCategory : response.getParameters()) {
-				Category category = new Category(currentCategory.get("categoryId").toString(), currentCategory.get("name").toString());
-				categories.put(currentCategory.get("categoryId").toString(), category);
+				Category category = new Category(currentCategory.get("categoryId").toString(),
+						currentCategory.get("name").toString());
+				categories.put(currentCategory.get("name").toString(), category);
 			}
 
 			return categories;
@@ -39,25 +40,22 @@ class Utils {
 
 	public static void generateProductList(RequestManager requestManager, HashMap<String, Category> categories) {
 
-		Response response = requestManager.sendGetCategoriesRequest();
+		Response response = requestManager.sentGetProductsRequest();
 
 		if (response.getResCode() == Response.GET_PRODUCTS) {
 
 			for (HashMap<String, Object> currentProduct : response.getParameters()) {
-
 				Product product = new Product(currentProduct.get("productId").toString(), //
-						currentProduct.get("name").toString(), //
-						currentProduct.get("categoryId").toString());
+						currentProduct.get("productName").toString(), //
+						currentProduct.get("categoryName").toString());
 
-				Category category = categories.get(currentProduct.get("categoryId").toString());
+				Category category = categories.get(currentProduct.get("categoryName").toString());
 				category.addProduct(product);
-
 			}
-
+			return;
 		}
 
 		System.out.println("error!!");
-		return;
 	}
 
 	//-------------------------------------------------------------------------------------//
@@ -103,41 +101,5 @@ class Utils {
 		return textField;
 
 	}
-
-	//-------------------------------------------------------------------------------------//
-
-	public static String[] parseAllCategories(HashMap<String, Category> categories) {
-
-		String[] categoriesArray = new String[categories.size()];
-		int i = 0;
-		for (Category current : categories.values()) {
-			categoriesArray[i] = current.getName();
-			i++;
-		}
-
-		return categoriesArray;
-	}
-
-	//-------------------------------------------------------------------------------------//
-
-	public static String[] parseAllProducts(HashMap<String, Category> categories) {
-
-		String[] productsArray = new String[100];
-
-		int i = 0;
-		for (Category current : categories.values()) {
-			for (Product product : current.getProducts()) {
-				productsArray[i] = product.getName();
-				i++;
-			}
-		}
-
-		return productsArray;
-	}
-
-	//		categoriesComboBox = new JComboBox<Object>(categoriesArray);
-	//		categoriesComboBox.setBounds(b1, b2, b3, b4);
-	//		categoriesComboBox.setSelectedIndex(0);
-	//		panel.add(categoriesComboBox);
 
 }
