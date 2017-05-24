@@ -71,7 +71,7 @@ public class SellingOffers {
 		for (HashMap<String, Object> currentOffer : parameters) {
 
 			Offer offer = new Offer();
-			offer.setAction("Buy").setOfferId(currentOffer.get("sOfferId").toString())
+			offer.setAction("Sell").setOfferId(currentOffer.get("sOfferId").toString())
 					.setQuantity(currentOffer.get("quantity").toString())
 					.setUnitPrice(currentOffer.get("unitPrice").toString())
 					.setCategoryName(currentOffer.get("categoryName").toString())

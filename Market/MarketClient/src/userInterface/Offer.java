@@ -82,9 +82,13 @@ public class Offer {
 			public void actionPerformed(ActionEvent e) {
 
 				HashMap<String, Object> parameters = new HashMap<>();
-				parameters.put("", "");
+				if (action.equals("Buy"))
+					parameters.put("sOfferId", Integer.parseInt(offerId));
+				else
+					parameters.put("bOfferId", Integer.parseInt(offerId));
 
-				Response response = requestManager.sendAcceptOfferRequest(parameters);
+				Response response = requestManager.sendAcceptOfferRequest(parameters, action);
+				buyButton.setBackground(Color.RED);
 
 			}
 		});
@@ -96,6 +100,7 @@ public class Offer {
 	public JPanel getOfferPanel() {
 		return offerPanel;
 	}
+
 	//-------------------------------------------------------------------------------------//
 
 	public Offer setOfferId(String offerId) {

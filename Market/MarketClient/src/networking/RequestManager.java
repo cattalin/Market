@@ -239,9 +239,15 @@ public class RequestManager {
 
 	//-------------------------------------------------------------------------------------//
 
-	public Response sendAcceptOfferRequest(HashMap<String, Object> parameters) {
+	public Response sendAcceptOfferRequest(HashMap<String, Object> parameters, String type) {
 
-		Request req = new Request(Request.GET_SELLING_OFFERS);
+		Request req = null;
+
+		if (!type.equals("Buy"))
+			req = new Request(Request.ACCEPT_BUYING_OFFER);
+		else
+			req = new Request(Request.ACCEPT_SELLING_OFFER);
+
 		req.setParameters(parameters);
 
 		try {
