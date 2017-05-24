@@ -87,6 +87,16 @@ public class ClientThread implements Runnable {
 					output.writeObject(res);
 					output.flush();
 					break;
+				case Request.GET_BUYING_OFFERS:
+					res = getBuyingOffersResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.GET_SELLING_OFFERS:
+					res = getSellingOffersResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
 
 				}
 			} catch (ClassNotFoundException e) {
@@ -195,6 +205,40 @@ public class ClientThread implements Runnable {
 
 	// -------------------------------------------------------------------------------------//
 
+	private Response getBuyingOffersResponse(Request req) {
+		HashMap<String, Object> params = req.getParameters();
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.getBuyingOffers((Integer) params.get("categoryId"),
+				(Integer) params.get("productId"));
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_BUYING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getSellingOffersResponse(Request req) {
+		HashMap<String, Object> params = req.getParameters();
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.getSellingOffers((Integer) params.get("categoryId"),
+				(Integer) params.get("productId"));
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_SELLING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+
+	}
+
+	// -------------------------------------------------------------------------------------//
+
 	private Response getCreateBuyingOfferResponse(Request req) {
 		int quantity = (Integer) req.getParameters().get("quantity");
 		int totalPrice = (Integer) req.getParameters().get("totalPrice");
@@ -225,7 +269,7 @@ public class ClientThread implements Runnable {
 		int productId = (Integer) req.getParameters().get("productId");
 		int sellerId = (Integer) req.getParameters().get("sellerId");
 
-		ArrayList<HashMap<String, Object>> resultParams = dbManager.createBuyingOffer(quantity, totalPrice, unitPrice,
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.createSellingOffer(quantity, totalPrice, unitPrice,
 				categoryId, productId, sellerId);
 		Response res;
 		if (resultParams.size() != 0) {

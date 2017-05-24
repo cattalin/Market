@@ -245,6 +245,143 @@ public class DatabaseManager {
 		return result;
 	}
 
+
+	// -------------------------------------------------------------------------------------//
+
+	public ArrayList<HashMap<String, Object>> getBuyingOffers(int categoryId, int productId) {
+
+		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
+		try {
+			String command = "SELECT * FROM buying_offers "
+					+ "INNER JOIN users ON buying_offers.buyerId = users.userId "
+					+ "INNER JOIN categories ON buying_offers.categoryId = categories.categoryId "
+					+ "INNER JOIN products ON buying_offers.productId = products.productId ";
+
+
+			if (categoryId != 0 && productId != 0) {
+				command += "WHERE ( buying_offers.categoryId=? AND buying_offers.productId=? AND isActive=1 )";
+			} else if (categoryId != 0) {
+				command += "WHERE buying_offers.categoryId=? AND isActive=1";
+			} else if (productId != 0) {
+				command += "WHERE buying_offers.productId=? AND isActive=1";
+			}
+
+
+			PreparedStatement preparedStatement = connection.prepareStatement(command);
+			System.out.println("mere");
+			if (categoryId != 0 && productId != 0) {
+				preparedStatement.setInt(1, categoryId);
+				preparedStatement.setInt(2, productId);
+			} else if (categoryId != 0)
+				preparedStatement.setInt(1, categoryId);
+			else if (productId != 0)
+				preparedStatement.setInt(1, productId);
+
+
+			ResultSet rs = preparedStatement.executeQuery();
+
+			while (rs.next()) {
+
+				int bOfferId = rs.getInt("bOfferId");
+				int quantity = rs.getInt("quantity");
+				int totalPrice = rs.getInt("totalPrice");
+				int unitPrice = rs.getInt("unitPrice");
+				String categoryName = rs.getString("categories.name");
+				String productName = rs.getString("products.name");
+				String buyer = rs.getString("username");
+
+				System.out.println(rs);
+				HashMap<String, Object> product = new HashMap<>();
+				product.put("success", "true");// TODO REMOVE THIS AND REWORK
+												// THE
+												// RESPONSE CLASS
+				product.put("bOfferId", bOfferId);
+				product.put("quantity", quantity);
+				product.put("totalPrice", totalPrice);
+				product.put("unitPrice", unitPrice);
+				product.put("buyer", buyer);
+				product.put("categoryName", categoryName);
+				product.put("productName", productName);
+				result.add(product);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+
+
+
+	// -------------------------------------------------------------------------------------//
+
+	public ArrayList<HashMap<String, Object>> getSellingOffers(int categoryId, int productId) {
+
+		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
+		try {
+			String command = "SELECT * FROM selling_offers "
+					+ "INNER JOIN users ON selling_offers.sellerId = users.userId "
+					+ "INNER JOIN categories ON selling_offers.categoryId = categories.categoryId "
+					+ "INNER JOIN products ON selling_offers.productId = products.productId ";
+
+			if (categoryId != 0 && productId != 0) {
+				command += "WHERE ( selling_offers.categoryId=? AND selling_offers.productId=? AND isActive=1)";
+			} else if (categoryId != 0) {
+				command += "WHERE selling_offers.categoryId=? AND isActive=1";
+			} else if (productId != 0) {
+				command += "WHERE selling_offers.productId=? AND isActive=1";
+			}
+
+
+			PreparedStatement preparedStatement = connection.prepareStatement(command);
+			System.out.println("mere");
+			if (categoryId != 0 && productId != 0) {
+				preparedStatement.setInt(1, categoryId);
+				preparedStatement.setInt(2, productId);
+			} else if (categoryId != 0)
+				preparedStatement.setInt(1, categoryId);
+			else if (productId != 0)
+				preparedStatement.setInt(1, productId);
+
+
+			ResultSet rs = preparedStatement.executeQuery();
+
+			while (rs.next()) {
+
+				int sOfferId = rs.getInt("sOfferId");
+				int quantity = rs.getInt("quantity");
+				int totalPrice = rs.getInt("totalPrice");
+				int unitPrice = rs.getInt("unitPrice");
+				String categoryName = rs.getString("categories.name");
+				String productName = rs.getString("products.name");
+				String seller = rs.getString("username");
+
+				System.out.println(rs);
+				HashMap<String, Object> product = new HashMap<>();
+				product.put("success", "true");// TODO REMOVE THIS AND REWORK
+												// THE
+												// RESPONSE CLASS
+				product.put("sOfferId", sOfferId);
+				product.put("quantity", quantity);
+				product.put("totalPrice", totalPrice);
+				product.put("unitPrice", unitPrice);
+				product.put("seller", seller);
+				product.put("categoryName", categoryName);
+				product.put("productName", productName);
+				result.add(product);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+
+
+
+
 	public ArrayList<HashMap<String, Object>> createBuyingOffer(int quantity, int totalPrice, int unitPrice,
 			int categoryId, int productId, int buyerId) {
 		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
