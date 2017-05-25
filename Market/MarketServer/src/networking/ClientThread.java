@@ -1,5 +1,6 @@
 package networking;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,6 +19,7 @@ public class ClientThread implements Runnable {
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private Socket socket;
+	private volatile boolean shutdown = false;
 	DatabaseManager dbManager;
 
 	// -------------------------------------------------------------------------------------//
@@ -44,7 +46,7 @@ public class ClientThread implements Runnable {
 
 	@Override
 	public void run() {
-		while (true)
+		while (!shutdown)
 			try {
 				Request req = (Request) input.readObject();
 				System.out.println(req);
@@ -71,14 +73,54 @@ public class ClientThread implements Runnable {
 					output.writeObject(res);
 					output.flush();
 					break;
+				case Request.GET_PRODUCTS:
+					res = getProductsResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.CREATE_BUYING_OFFER:
+					res = getCreateBuyingOfferResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.CREATE_SELLING_OFFER:
+					res = getCreateSellingOfferResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.GET_BUYING_OFFERS:
+					res = getBuyingOffersResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.GET_SELLING_OFFERS:
+					res = getSellingOffersResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.ACCEPT_BUYING_OFFER:
+					res = getAcceptBuyingOfferResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.ACCEPT_SELLING_OFFER:
+					res = getAcceptSellingOfferResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.DISCONNECT:
+					this.close();
+					break;
 
 				}
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				break;
 			} catch (IOException e) {
 				e.printStackTrace();
+				break;
 			}
+
 	}
 
 	public void close() {
@@ -87,6 +129,7 @@ public class ClientThread implements Runnable {
 			output.close();
 			socket.close();
 			dbManager.disconnect();
+			shutdown = true;
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
@@ -99,8 +142,6 @@ public class ClientThread implements Runnable {
 	private Response getLoginResponse(Request req) {
 		String username = req.getParameters().get("username").toString();
 		String password = req.getParameters().get("password").toString();
-
-
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.login(username, password);
 
 		Response res;
@@ -119,7 +160,6 @@ public class ClientThread implements Runnable {
 		String username = req.getParameters().get("username").toString();
 		String password = req.getParameters().get("password").toString();
 		String email = req.getParameters().get("email").toString();
-		dbManager.connect();
 
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.register(username, password, email);
 		Response res;
@@ -136,9 +176,6 @@ public class ClientThread implements Runnable {
 	// -------------------------------------------------------------------------------------//
 
 	private Response getCategoryResponse(Request req) {
-
-		System.out.println("AIIC");
-		dbManager.connect();
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.getCategories();
 		Response res;
 		if (resultParams.size() != 0) {
@@ -153,9 +190,7 @@ public class ClientThread implements Runnable {
 	// -------------------------------------------------------------------------------------//
 
 	private Response getProductsByCategoryResponse(Request req) {
-
 		int categoryId = Integer.parseInt(req.getParameters().get("categoryId").toString());
-		dbManager.connect();
 		ArrayList<HashMap<String, Object>> resultParams = dbManager.getProductsByCategory(categoryId);
 
 		Response res;
@@ -167,5 +202,132 @@ public class ClientThread implements Runnable {
 		return res;
 
 	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getProductsResponse(Request req) {
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.getProducts();
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_PRODUCTS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getBuyingOffersResponse(Request req) {
+		HashMap<String, Object> params = req.getParameters();
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.getBuyingOffers((Integer) params.get("categoryId"),
+				(Integer) params.get("productId"));
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_BUYING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getSellingOffersResponse(Request req) {
+		HashMap<String, Object> params = req.getParameters();
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.getSellingOffers((Integer) params.get("categoryId"),
+				(Integer) params.get("productId"));
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_SELLING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getAcceptBuyingOfferResponse(Request req) {
+		HashMap<String, Object> params = req.getParameters();
+		ArrayList<HashMap<String, Object>> resultParams = dbManager//
+				.acceptBuyingOffer((Integer) params.get("bOfferId"));
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_SELLING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getAcceptSellingOfferResponse(Request req) {
+		HashMap<String, Object> params = req.getParameters();
+		ArrayList<HashMap<String, Object>> resultParams = dbManager
+				.acceptSellingOffer((Integer) params.get("sOfferId"));
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_SELLING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getCreateBuyingOfferResponse(Request req) {
+		int quantity = (Integer) req.getParameters().get("quantity");
+		int totalPrice = (Integer) req.getParameters().get("totalPrice");
+		int unitPrice = (Integer) req.getParameters().get("unitPrice");
+		int categoryId = (Integer) req.getParameters().get("categoryId");
+		int productId = (Integer) req.getParameters().get("productId");
+		int buyerId = (Integer) req.getParameters().get("buyerId");
+
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.createBuyingOffer(quantity, totalPrice, unitPrice,
+				categoryId, productId, buyerId);
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_BUYING_OFFERS);// TODO remove this
+															// dummy response
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+
+		return res;
+
+	}
+
+	private Response getCreateSellingOfferResponse(Request req) {
+		int quantity = (Integer) req.getParameters().get("quantity");
+		int totalPrice = (Integer) req.getParameters().get("totalPrice");
+		int unitPrice = (Integer) req.getParameters().get("unitPrice");
+		int categoryId = (Integer) req.getParameters().get("categoryId");
+		int productId = (Integer) req.getParameters().get("productId");
+		int sellerId = (Integer) req.getParameters().get("sellerId");
+
+		ArrayList<HashMap<String, Object>> resultParams = dbManager.createSellingOffer(quantity, totalPrice, unitPrice,
+				categoryId, productId, sellerId);
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_SELLING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+
+		return res;
+
+	}
+
 
 }

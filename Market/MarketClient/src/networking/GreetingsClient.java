@@ -1,8 +1,11 @@
 package networking;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.util.HashMap;
 
 public class GreetingsClient {
@@ -10,29 +13,24 @@ public class GreetingsClient {
 	public static void main(String[] args) {
 		String serverName = "79.115.29.173";
 		int port = 3000;
-		//		try {
-		//			System.out.println("Connecting to " + serverName + " on port " + port);
-		//			Socket client = new Socket(serverName, port);
-		//
-		//			System.out.println("Just connected to " + client.getRemoteSocketAddress());
-		//			OutputStream outToServer = client.getOutputStream();
-		//			ObjectOutputStream out = new ObjectOutputStream(outToServer);
-		//			InputStream inFromServer = client.getInputStream();
-		//			ObjectInputStream in = new ObjectInputStream(inFromServer);
+		try {
+			System.out.println("Connecting to " + serverName + " on port " + port);
+			Socket client = new Socket(serverName, port);
 
-		//			GreetingsClient.sendLoginRequest(in, out);
-		//			GreetingsClient.sendLoginRequest(in, out);
-		RequestManager requestManager = RequestManager.getInstance();
+			System.out.println("Just connected to " + client.getRemoteSocketAddress());
+			OutputStream outToServer = client.getOutputStream();
+			ObjectOutputStream out = new ObjectOutputStream(outToServer);
+			InputStream inFromServer = client.getInputStream();
+			ObjectInputStream in = new ObjectInputStream(inFromServer);
 
-		Response response = requestManager.sendGetCategoriesRequest();
-		System.out.println("Getting categories...");
-		requestManager.closeConnection();
-		//			GreetingsClient.sendGetCategoriesRequest(in, out);
+			GreetingsClient.sendLoginRequest(in, out);
+			GreetingsClient.sendLoginRequest(in, out);
+			GreetingsClient.sendGetProductsByCategoryRequest(in, out);
 
-		//			client.close();
-		//		} catch (IOException e) {
-		//			e.printStackTrace();
-		//		}
+			client.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void sendLoginRequest(ObjectInputStream in, ObjectOutputStream out) {
@@ -130,8 +128,8 @@ public class GreetingsClient {
 
 		System.out.println("sending get categories request");
 		Request req = new Request(Request.GET_CATEGORIES);
-		//		HashMap<String, Object> parameters = new HashMap<>();
-		//		req.setParameters(parameters);
+		HashMap<String, Object> parameters = new HashMap<>();
+		req.setParameters(parameters);
 
 		try {
 			out.writeObject(req);
@@ -142,16 +140,16 @@ public class GreetingsClient {
 			e1.printStackTrace();
 		}
 
-		try {
-			System.out.println("Server says " + in.readObject().toString());
-
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//		try {
+		//			//System.out.println("Server says " + in.readObject().toString());
+		//
+		//		} catch (ClassNotFoundException e) {
+		//			// TODO Auto-generated catch block
+		//			e.printStackTrace();
+		//		} catch (IOException e) {
+		//			// TODO Auto-generated catch block
+		//			e.printStackTrace();
+		//		}
 
 	}
 }

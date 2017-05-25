@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class Board {
 
@@ -13,6 +14,7 @@ public class Board {
 
 	private static final Board board = new Board();
 
+	private JScrollPane boardScrollPanel;
 	private JPanel boardPanel;
 
 	//-------------------------------------------------------------------------------------//
@@ -31,6 +33,7 @@ public class Board {
 	public void initialize() {
 
 		boardPanel = new JPanel(new CardLayout());
+		boardScrollPanel = new JScrollPane(boardPanel);
 		boardPanel.setBackground(new Color(242, 242, 242));
 		boardPanel.setSize(700, 700);
 
@@ -40,6 +43,12 @@ public class Board {
 		boardPanel.add(startPanel, " startPanel");
 
 		//TODO: think what to add here
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public JScrollPane getBoardScrollPanel() {
+		return boardScrollPanel;
 	}
 
 	//-------------------------------------------------------------------------------------//

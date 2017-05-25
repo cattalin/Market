@@ -6,48 +6,38 @@ public class Product {
 	//Instance fields
 	//-------------------------------------------------------------------------------------//
 
-	private final String productId;
-	private final String productName;
-	private final String categoryId;
+	private final String NAME;
+	private final String CATEGORY_NAME;
 
 	//-------------------------------------------------------------------------------------//
 	//Constructor
 	//-------------------------------------------------------------------------------------//
 
-	public Product( String productId,String productName, String categoryId) {
+	public Product(String name, String categoryName) {
 
-		this.productId=productId;
-		this.productName = productName;
-		this.categoryId = categoryId;
+		NAME = name;
+		CATEGORY_NAME = categoryName;
 	}
 
 	//-------------------------------------------------------------------------------------//
 	//Instance methods
 	//-------------------------------------------------------------------------------------//
-	
-	public String getId() {
-		return productId;
-	}
-	
-	//-------------------------------------------------------------------------------------//
 
 	public String getName() {
-		return productName;
+		return NAME;
 	}
 
 	//-------------------------------------------------------------------------------------//
 
-	public String getCategoryId() {
-		return categoryId;
+	public String getCategoryName() {
+		return CATEGORY_NAME;
 	}
-	
-	//-------------------------------------------------------------------------------------//
 
+	//-------------------------------------------------------------------------------------//
 
 	@Override
 	public String toString() {
-		return "Product [id=" + productId + ", name=" + productName + ", categoryId=" + categoryId + "]";
+		return "Product [NAME=" + NAME + ", CATEGORY_NAME=" + CATEGORY_NAME + "]";
 	}
 
-	
 }

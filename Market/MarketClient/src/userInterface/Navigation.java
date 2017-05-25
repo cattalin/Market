@@ -21,7 +21,6 @@ public class Navigation {
 	private JButton newOfferButton;
 	private JButton buyButton;
 	private JButton sellButton;
-	private JButton deleteAcc;
 
 	//-------------------------------------------------------------------------------------//
 	//Constructor
@@ -36,7 +35,7 @@ public class Navigation {
 
 	//-------------------------------------------------------------------------------------//
 
-	public void initialize(String username) {
+	public void initialize() {
 
 		navPanel = new JPanel(null);
 		navScrollPane = new JScrollPane(navPanel);
@@ -50,7 +49,7 @@ public class Navigation {
 		greetingsMessage.setBounds(50, 10, 100, 100);
 		navPanel.add(greetingsMessage);
 
-		JLabel firstName = new JLabel(username);
+		JLabel firstName = new JLabel("FETITOIDUL"); //TODO: get user's first name and send it here as parameter
 		firstName.setFont(new Font("Microsoft JhengHei", Font.BOLD, 17));
 		firstName.setForeground(Color.WHITE);
 		firstName.setBounds(50, 35, 100, 100);
@@ -79,12 +78,6 @@ public class Navigation {
 		sellButton.setBackground(new Color(0, 128, 0));
 		sellButton.setForeground(Color.WHITE);
 		navPanel.add(sellButton);
-
-		//		deleteAcc = new JButton("Delete Account");
-		//		deleteAcc.setBounds(20, 500, 150, 30);
-		//		deleteAcc.setBackground(Color.RED);
-		//		deleteAcc.setForeground(Color.WHITE);
-		//		navPanel.add(deleteAcc);
 
 	}
 

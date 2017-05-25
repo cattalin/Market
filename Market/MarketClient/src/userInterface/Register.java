@@ -53,13 +53,13 @@ public class Register {
 		submitButton.setBackground(new Color(0, 128, 0));
 		submitButton.setForeground(new Color(255, 255, 255));
 		submitButton.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 14));
-		submitButton.setBounds(201, 279, 163, 29);
+		submitButton.setBounds(201, 299, 163, 29);
 		registerPanel.add(submitButton);
 
 		//Cancel
 		cancelSubmit = new JButton("Cancel");
 		cancelSubmit.setForeground(Color.RED);
-		cancelSubmit.setBounds(239, 319, 89, 23);
+		cancelSubmit.setBounds(239, 339, 89, 23);
 		registerPanel.add(cancelSubmit);
 	}
 

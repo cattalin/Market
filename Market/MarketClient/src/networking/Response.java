@@ -12,7 +12,7 @@ public class Response implements Serializable {
 	public static final int GET_CATEGORIES = 53;
 	public static final int GET_BUYING_OFFERS = 54;
 	public static final int GET_SELLING_OFFERS = 55;
-
+	
 	public static final int LOGIN_DENIED = 70;
 	public static final int REGISTER_ERROR = 72;
 	public static final int DATABASE_ERROR = 73;
@@ -37,6 +37,8 @@ public class Response implements Serializable {
 		return parameters;
 	}
 
+
+
 	public String toString() {
 		String result = "";
 		switch (resCode) {
@@ -52,17 +54,17 @@ public class Response implements Serializable {
 		case GET_CATEGORIES:
 			result += "GET_CATEGORIES";
 			break;
-		case GET_BUYING_OFFERS:
+		case GET_BUYING_OFFERS :
 			result += "GET_BUYING_OFFERS";
 			break;
-		case GET_SELLING_OFFERS:
+		case GET_SELLING_OFFERS :
 			result += "GET_SELLING_OFFERS";
 			break;
-
+		
 		case LOGIN_DENIED:
 			result += "LOGIN_DENIED";
 			break;
-		case REGISTER_ERROR:
+		case REGISTER_ERROR :
 			result += "REGISTER_ERROR";
 			break;
 		case DATABASE_ERROR:
@@ -70,9 +72,9 @@ public class Response implements Serializable {
 			break;
 		}
 		result += " response with the parameters ";
-		if (parameters != null)
+		if(parameters!=null)
 			result += parameters.toString();
-
+		
 		return result;
 	}
 }
