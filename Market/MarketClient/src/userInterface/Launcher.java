@@ -94,6 +94,7 @@ public class Launcher {
 			}
 
 			public void windowClosing(WindowEvent winEvt) {
+				requestManager.sendDisconectRequest();
 				this.requestManager.closeConnection();
 				System.exit(0);
 			}
@@ -223,6 +224,8 @@ public class Launcher {
 			}
 
 			public void windowClosing(WindowEvent winEvt) {
+				requestManager.sendDisconectRequest();
+
 				this.requestManager.closeConnection();
 				System.exit(0);
 			}
@@ -303,9 +306,8 @@ public class Launcher {
 				parameters.put("categoryId", categoryId);
 				parameters.put("productId", productId);
 
-				Response response = requestManager.sendBuyingOffersRequest(parameters);
-
-				if (response.getResCode() == Response.GET_BUYING_OFFERS) {
+				Response response = requestManager.sendSellingOffersRequest(parameters);
+				if (response.getResCode() == Response.GET_SELLING_OFFERS) {
 					buyingOffers.setParameters(response.getParameters());
 					buyingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
 							productsComboBox.getSelectedItem().toString());
@@ -336,9 +338,9 @@ public class Launcher {
 				parameters.put("categoryId", categoryId);
 				parameters.put("productId", productId);
 
-				Response response = requestManager.sendSellingOffersRequest(parameters);
+				Response response = requestManager.sendBuyingOffersRequest(parameters);
 
-				if (response.getResCode() == Response.GET_SELLING_OFFERS) {
+				if (response.getResCode() == Response.GET_BUYING_OFFERS) {
 					sellingOffers.setParameters(response.getParameters());
 					sellingOffers.initialize(categoriesComboBox.getSelectedItem().toString(),
 							productsComboBox.getSelectedItem().toString());

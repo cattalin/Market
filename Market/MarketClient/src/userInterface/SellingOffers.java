@@ -66,17 +66,19 @@ public class SellingOffers {
 	public void showOffers() {
 		int b1 = 40, b2 = 70, b3 = 600, b4 = 100;
 		JPanel offerPanel;
+		if (parameters == null)
+			return;
 		sellingOffersPanel.setPreferredSize(new Dimension(700, parameters.size() * 120 + 70));
 
 		for (HashMap<String, Object> currentOffer : parameters) {
 
 			Offer offer = new Offer();
-			offer.setAction("Sell").setOfferId(currentOffer.get("sOfferId").toString())
+			offer.setAction("Sell").setOfferId(currentOffer.get("bOfferId").toString())
 					.setQuantity(currentOffer.get("quantity").toString())
 					.setUnitPrice(currentOffer.get("unitPrice").toString())
 					.setCategoryName(currentOffer.get("categoryName").toString())
 					.setProductName(currentOffer.get("productName").toString())
-					.setUserName(currentOffer.get("seller").toString()).initialize();
+					.setUserName(currentOffer.get("buyer").toString()).initialize();
 
 			offerPanel = offer.getOfferPanel();
 			offerPanel.setBounds(b1, b2, b3, b4);

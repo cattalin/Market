@@ -74,12 +74,12 @@ public class BuyingOffers {
 		for (HashMap<String, Object> currentOffer : parameters) {
 
 			Offer offer = new Offer();
-			offer.setAction("Buy").setOfferId(currentOffer.get("bOfferId").toString())
+			offer.setAction("Buy").setOfferId(currentOffer.get("sOfferId").toString())
 					.setQuantity(currentOffer.get("quantity").toString())
 					.setUnitPrice(currentOffer.get("unitPrice").toString())
 					.setCategoryName(currentOffer.get("categoryName").toString())
 					.setProductName(currentOffer.get("productName").toString())
-					.setUserName(currentOffer.get("buyer").toString()).initialize();
+					.setUserName(currentOffer.get("seller").toString()).initialize();
 
 			offerPanel = offer.getOfferPanel();
 			offerPanel.setBounds(b1, b2, b3, b4);

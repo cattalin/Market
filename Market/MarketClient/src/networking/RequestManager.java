@@ -266,6 +266,21 @@ public class RequestManager {
 
 	//-------------------------------------------------------------------------------------//
 
+	public void sendDisconectRequest() {
+
+		Request req = new Request(Request.DISCONNECT);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+	}
+
+	//-------------------------------------------------------------------------------------//
+
 	public void closeConnection() {
 		try {
 			in.close();
