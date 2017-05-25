@@ -197,6 +197,90 @@ public class RequestManager {
 
 	//-------------------------------------------------------------------------------------//
 
+	public Response sendBuyingOffersRequest(HashMap<String, Object> parameters) {
+
+		Request req = new Request(Request.GET_BUYING_OFFERS);
+		req.setParameters(parameters);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public Response sendSellingOffersRequest(HashMap<String, Object> parameters) {
+
+		Request req = new Request(Request.GET_SELLING_OFFERS);
+		req.setParameters(parameters);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public Response sendAcceptOfferRequest(HashMap<String, Object> parameters, String type) {
+
+		Request req = null;
+
+		if (!type.equals("Buy"))
+			req = new Request(Request.ACCEPT_BUYING_OFFER);
+		else
+			req = new Request(Request.ACCEPT_SELLING_OFFER);
+
+		req.setParameters(parameters);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+			Response res = (Response) in.readObject();
+			return res;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public void sendDisconectRequest() {
+
+		Request req = new Request(Request.DISCONNECT);
+
+		try {
+			out.writeObject(req);
+			out.flush();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+	}
+
+	//-------------------------------------------------------------------------------------//
+
 	public void closeConnection() {
 		try {
 			in.close();

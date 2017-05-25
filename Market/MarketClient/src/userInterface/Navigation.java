@@ -21,6 +21,7 @@ public class Navigation {
 	private JButton newOfferButton;
 	private JButton buyButton;
 	private JButton sellButton;
+	private JButton deleteAcc;
 
 	//-------------------------------------------------------------------------------------//
 	//Constructor
@@ -78,6 +79,12 @@ public class Navigation {
 		sellButton.setBackground(new Color(0, 128, 0));
 		sellButton.setForeground(Color.WHITE);
 		navPanel.add(sellButton);
+
+		//		deleteAcc = new JButton("Delete Account");
+		//		deleteAcc.setBounds(20, 500, 150, 30);
+		//		deleteAcc.setBackground(Color.RED);
+		//		deleteAcc.setForeground(Color.WHITE);
+		//		navPanel.add(deleteAcc);
 
 	}
 

@@ -3,6 +3,8 @@ package userInterface;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,6 +19,7 @@ public class SellingOffers {
 	private static final SellingOffers sellingOffers = new SellingOffers();
 
 	private JPanel sellingOffersPanel;
+	private ArrayList<HashMap<String, Object>> parameters;
 
 	//-------------------------------------------------------------------------------------//
 	//Constructor
@@ -54,7 +57,7 @@ public class SellingOffers {
 		category.setForeground(new Color(255, 69, 0));
 		sellingOffersPanel.add(category);
 
-		showOffers(); //TODO: remove
+		showOffers();
 
 	}
 
@@ -63,14 +66,30 @@ public class SellingOffers {
 	public void showOffers() {
 		int b1 = 40, b2 = 70, b3 = 600, b4 = 100;
 		JPanel offerPanel;
-		sellingOffersPanel.setPreferredSize(new Dimension(700, 10 * 120 + 70));
+		if (parameters == null)
+			return;
+		sellingOffersPanel.setPreferredSize(new Dimension(700, parameters.size() * 120 + 70));
 
-		for (int i = 0; i < 10; i++) {
-			S_offer offer = new S_offer();
+		for (HashMap<String, Object> currentOffer : parameters) {
+
+			Offer offer = new Offer();
+			offer.setAction("Sell").setOfferId(currentOffer.get("bOfferId").toString())
+					.setQuantity(currentOffer.get("quantity").toString())
+					.setUnitPrice(currentOffer.get("unitPrice").toString())
+					.setCategoryName(currentOffer.get("categoryName").toString())
+					.setProductName(currentOffer.get("productName").toString())
+					.setUserName(currentOffer.get("buyer").toString()).initialize();
+
 			offerPanel = offer.getOfferPanel();
 			offerPanel.setBounds(b1, b2, b3, b4);
 			b2 += 120;
 			sellingOffersPanel.add(offerPanel);
 		}
+	}
+
+	//-------------------------------------------------------------------------------------//
+
+	public void setParameters(ArrayList<HashMap<String, Object>> parameters) {
+		this.parameters = parameters;
 	}
 }
