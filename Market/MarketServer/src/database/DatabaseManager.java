@@ -261,9 +261,11 @@ public class DatabaseManager {
 			if (categoryId != 0 && productId != 0) {
 				command += "WHERE ( buying_offers.categoryId=? AND buying_offers.productId=? AND isActive=1 )";
 			} else if (categoryId != 0) {
-				command += "WHERE buying_offers.categoryId=? AND isActive=1";
+				command += "WHERE (buying_offers.categoryId=? AND isActive=1)";
 			} else if (productId != 0) {
-				command += "WHERE buying_offers.productId=? AND isActive=1";
+				command += "WHERE (buying_offers.productId=? AND isActive=1)";
+			} else {
+				command += "WHERE isActive=1 ";
 			}
 
 
@@ -290,7 +292,6 @@ public class DatabaseManager {
 				String productName = rs.getString("products.name");
 				String buyer = rs.getString("username");
 
-				System.out.println(rs);
 				HashMap<String, Object> product = new HashMap<>();
 				product.put("success", "true");// TODO REMOVE THIS AND REWORK
 												// THE
@@ -328,9 +329,11 @@ public class DatabaseManager {
 			if (categoryId != 0 && productId != 0) {
 				command += "WHERE ( selling_offers.categoryId=? AND selling_offers.productId=? AND isActive=1)";
 			} else if (categoryId != 0) {
-				command += "WHERE selling_offers.categoryId=? AND isActive=1";
+				command += "WHERE (selling_offers.categoryId=? AND isActive=1)";
 			} else if (productId != 0) {
-				command += "WHERE selling_offers.productId=? AND isActive=1";
+				command += "WHERE (selling_offers.productId=? AND isActive=1)";
+			} else {
+				command += "WHERE isActive=1 ";
 			}
 
 
@@ -357,7 +360,7 @@ public class DatabaseManager {
 				String productName = rs.getString("products.name");
 				String seller = rs.getString("username");
 
-				System.out.println(rs);
+
 				HashMap<String, Object> product = new HashMap<>();
 				product.put("success", "true");// TODO REMOVE THIS AND REWORK
 												// THE
@@ -471,6 +474,52 @@ public class DatabaseManager {
 			HashMap<String, Object> response = new HashMap<>();
 			response.put("success", "false");// TODO REMOVE THIS AND REWORK THE
 			result.add(response);
+		}
+
+		return result;
+	}
+
+
+	// -------------------------------------------------------------------------------------//
+
+
+	public ArrayList<HashMap<String, Object>> acceptBuyingOffer(int bOfferId) {
+		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
+		try {
+			String command = "UPDATE buying_offers SET " + "isActive = 0 WHERE bOfferId = ?";
+			PreparedStatement preparedStatement = connection.prepareStatement(command);
+			preparedStatement.setInt(1, bOfferId);
+
+
+			preparedStatement.executeUpdate();
+
+
+			System.out.println("successfuly accepted offer");
+
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	public ArrayList<HashMap<String, Object>> acceptSellingOffer(int sOfferId) {
+		ArrayList<HashMap<String, Object>> result = new ArrayList<>();
+		try {
+			String command = "UPDATE selling_offers SET " + "isActive = 0 WHERE sOfferId = ?";
+			PreparedStatement preparedStatement = connection.prepareStatement(command);
+			preparedStatement.setInt(1, sOfferId);
+
+
+			preparedStatement.executeUpdate();
+
+
+			System.out.println("successfuly accepted offer");
+
+
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 
 		return result;

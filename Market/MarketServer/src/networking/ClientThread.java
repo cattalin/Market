@@ -19,6 +19,7 @@ public class ClientThread implements Runnable {
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private Socket socket;
+	private volatile boolean shutdown = false;
 	DatabaseManager dbManager;
 
 	// -------------------------------------------------------------------------------------//
@@ -45,7 +46,7 @@ public class ClientThread implements Runnable {
 
 	@Override
 	public void run() {
-		while (true)
+		while (!shutdown)
 			try {
 				Request req = (Request) input.readObject();
 				System.out.println(req);
@@ -97,6 +98,19 @@ public class ClientThread implements Runnable {
 					output.writeObject(res);
 					output.flush();
 					break;
+				case Request.ACCEPT_BUYING_OFFER:
+					res = getAcceptBuyingOfferResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.ACCEPT_SELLING_OFFER:
+					res = getAcceptSellingOfferResponse(req);
+					output.writeObject(res);
+					output.flush();
+					break;
+				case Request.DISCONNECT:
+					this.close();
+					break;
 
 				}
 			} catch (ClassNotFoundException e) {
@@ -115,6 +129,7 @@ public class ClientThread implements Runnable {
 			output.close();
 			socket.close();
 			dbManager.disconnect();
+			shutdown = true;
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
@@ -235,6 +250,38 @@ public class ClientThread implements Runnable {
 			res = new Response(Response.DATABASE_ERROR);
 		return res;
 
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getAcceptBuyingOfferResponse(Request req) {
+		HashMap<String, Object> params = req.getParameters();
+		ArrayList<HashMap<String, Object>> resultParams = dbManager//
+				.acceptBuyingOffer((Integer) params.get("bOfferId"));
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_SELLING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
+	}
+
+	// -------------------------------------------------------------------------------------//
+
+	private Response getAcceptSellingOfferResponse(Request req) {
+		HashMap<String, Object> params = req.getParameters();
+		ArrayList<HashMap<String, Object>> resultParams = dbManager
+				.acceptSellingOffer((Integer) params.get("sOfferId"));
+
+		Response res;
+		if (resultParams.size() != 0) {
+			res = new Response(Response.GET_SELLING_OFFERS);
+			res.setParameters(resultParams);
+		} else
+			res = new Response(Response.DATABASE_ERROR);
+		return res;
 	}
 
 	// -------------------------------------------------------------------------------------//
