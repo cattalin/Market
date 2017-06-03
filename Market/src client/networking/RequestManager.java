@@ -21,7 +21,7 @@ public class RequestManager {
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
 
-	private static final String SERVER_NAME = "5.12.19.26";
+	private static final String SERVER_NAME = "localhost";
 	private static final int PORT = 3000;
 
 	//-------------------------------------------------------------------------------------//

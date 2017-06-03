@@ -26,6 +26,7 @@ public class Request implements Serializable {
 	public static final int DISCONNECT = 33;
 	public static final int ACCEPT_BUYING_OFFER = 34;
 	public static final int ACCEPT_SELLING_OFFER = 35;
+
 	private int reqCode;
 	private HashMap<String, Object> parameters;
 
@@ -38,7 +39,6 @@ public class Request implements Serializable {
 		this.parameters = params;
 	}
 
-
 	public int getReqCode() {
 		return reqCode;
 	}
@@ -46,8 +46,6 @@ public class Request implements Serializable {
 	public HashMap<String, Object> getParameters() {
 		return parameters;
 	}
-
-
 
 	@Override
 	public String toString() {
